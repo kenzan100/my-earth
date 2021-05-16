@@ -15,6 +15,18 @@ describe Main do
     ]
   end
 
+  it "terminates if terminating space attr goes zero" do
+    @s2.add_condition(->(v) { v < 0 }, :game_ends)
+    base = {
+      @s2 => 0
+    }
+
+    result = Main.new(base, @events).resolve
+    _(result.triggered_conditions).must_equal(
+      [:game_ends, :game_ends]
+    )
+  end
+
   it "calculates the attributes given events" do
     base = {
       @s1 => 0,
@@ -23,7 +35,7 @@ describe Main do
 
     result = Main.new(base, @events).resolve
 
-    _(result).must_equal(
+    _(result.attributes).must_equal(
       {
         @s1 => 20,
         @s2 => 0,
