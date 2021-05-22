@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require 'dry/cli'
+
+module MyEarth
+  module MyJob
+    module Commands
+      extend Dry::CLI::Registry
+
+      class Init < Dry::CLI::Command
+        desc "Start a game"
+
+        def call(input: nil, **)
+          init = { energy: 100, money: 100 }
+          puts init
+        end
+      end
+
+      register 'init', Init
+    end
+  end
+end
+
+Dry::CLI.new(MyEarth::MyJob::Commands).call

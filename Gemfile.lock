@@ -1,12 +1,14 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    dry-cli (0.7.0)
     minitest (5.14.4)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  dry-cli
   minitest
 
 BUNDLED WITH
