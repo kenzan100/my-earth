@@ -2,21 +2,127 @@
 
 require 'dry/cli'
 
+FIXTURES = {
+  cs_book: {
+    name: :cs_book,
+    price: 10,
+    hourly_effects: {
+      cs_skill: 10,
+      energy: -5,
+    }
+  }
+}
+
 module MyEarth
   module MyJob
     module Commands
       extend Dry::CLI::Registry
 
+      class Purchase < Dry::CLI::Command
+        desc "Purchase goods"
+
+        argument :action, required: true, desc: "The name of goods for purchase. list to see the available goods."
+
+        def call(action:, **)
+          goods = [
+            FIXTURES[:cs_book]
+          ]
+          if action == 'list'
+            puts goods
+          else
+            puts "trying to purchase #{action}"
+            # do purchase
+          end
+        end
+      end
+
+      class Goods < Dry::CLI::Command
+        desc "List goods with me"
+
+        def call(**)
+          @my_goods = [
+            "CS Book *  1 | permanent",
+            "Cookie  * 10 | consumable"
+          ]
+          puts @my_goods
+        end
+      end
+
+      class Jobs < Dry::CLI::Command
+        argument :action
+        argument :job_id
+
+        def call(action: nil, job_id: nil, **)
+          @available_jobs = {
+            1 => "1 | Software engineer    | $30 / hour",
+            2 => "2 | McDonald's part-time | $10 / hour",
+          }
+
+          unless action
+            puts @available_jobs.values
+            return
+          end
+
+          if action && job_id
+            puts "Applying for #{@available_jobs[job_id.to_i]}"
+          else
+            puts "Usage: \"me jobs ACTION JOB_ID\""
+          end
+        end
+      end
+
+      class Schedule < Dry::CLI::Command
+        desc "Schedule your day"
+
+        argument :allocatable
+        argument :start_time
+        argument :end_time
+
+        def call(allocatable: nil, start_time: nil, end_time: nil, **)
+          if [allocatable, start_time, end_time].none?
+            @my_schedule = [
+              " 9 - 10 | Eat Cookie (energy +5)",
+              "10 - 12 | Study CS Book (cs_skill +20, energy -10)"
+            ]
+            puts @my_schedule
+            return
+          end
+
+          if allocatable && start_time && end_time
+            puts "Scheduled #{allocatable} from #{start_time} till #{end_time}"
+          else
+            puts "Usage: \"me schedule ALLOCATABLE START_TIME END_TIME\""
+          end
+        end
+      end
+
       class Init < Dry::CLI::Command
         desc "Start a game"
 
         def call(input: nil, **)
-          init = { energy: 100, money: 100 }
-          puts init
+          @stats = { energy: 100, money: 100 }
+          puts @stats
+        end
+      end
+
+      class Status < Dry::CLI::Command
+        desc "See current stats"
+
+        def call(input: nil, **)
+          # puts @stats TODO prepare in-memory states
+          @stats  = { energy: 80, money: 90 }
+          @goods  = { cs_book: 1 }
+          @skills = { cs_skill: 20 }
+          puts(@stats.merge(goods: @goods, skills: @skills))
         end
       end
 
       register 'init', Init
+      register 'stats', Status
+      register 'purchase', Purchase
+      register 'schedule', Schedule
+      register 'goods', Goods
+      register 'jobs', Jobs
     end
   end
 end
