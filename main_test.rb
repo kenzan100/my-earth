@@ -13,24 +13,27 @@ describe Main do
     vec1 = Force.new(@s1, :positive, 10)
     vec2 = Force.new(@s2, :negative, 5)
 
+    @cs_book = Item.new(:cs_book, :permanent)
+    @cookie  = Item.new(:cookie, :consumable)
+
     @events = [
-      Event.new(:study, :cs_book, [vec1, vec2]),
-      Event.new(:study, :cs_book, [vec1, vec2])
+      Events::Event.new(:study, @cs_book, [vec1, vec2]),
+      Events::Event.new(:study, @cs_book, [vec1, vec2])
     ]
   end
 
   it "simulates the single game play" do
     money_space = Space.new(:money)
     purchase_vec = Force.new(money_space, :negative, 10)
-    ev1 = Event.new(:purchase, :cs_book, [purchase_vec])
-    ev2 = Event.new(:purchase, :cookie,  [purchase_vec])
+    ev1 = Events::Event.new(:purchase, @cs_book, [purchase_vec])
+    ev2 = Events::Event.new(:purchase, @cookie,  [purchase_vec])
 
     _(Aggregates::Inventory.new([ev1, ev2]).to_s).must_equal(
-      "CS Book * 1 | permanent\nCookie * 10 | consumable"
+      "cs_book * 1 | permanent\ncookie * 1 | consumable"
     )
 
-    ev3 = Event.new(:schedule, :cs_book, [], { from: '', till: ''})
-    ev4 = Event.new(:schedule, :cookie,  [], { from: '', till: ''})
+    ev3 = Events::Event.new(:schedule, :cs_book, [], { from: '', till: ''})
+    ev4 = Events::Event.new(:schedule, :cookie,  [], { from: '', till: ''})
 
     ev5 = Events::GameTime.new(:tick, :game_time, [])
 
