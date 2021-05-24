@@ -1,5 +1,9 @@
 require "minitest/autorun"
-require_relative 'main'
+
+require "zeitwerk"
+loader = Zeitwerk::Loader.new
+loader.push_dir("#{__dir__}/lib")
+loader.setup
 
 describe Main do
   before do
@@ -10,20 +14,35 @@ describe Main do
     vec2 = Force.new(@s2, :negative, 5)
 
     @events = [
-      Event.new(:study_cs_app_book, [vec1, vec2]),
-      Event.new(:study_cs_app_book, [vec1, vec2])
+      Event.new(:study, :cs_book, [vec1, vec2]),
+      Event.new(:study, :cs_book, [vec1, vec2])
     ]
   end
 
   it "simulates the single game play" do
-    # start with initial energy and money
-    # buy book
-    # buy cookie
-    #
-    # schedule book and cookie
-    # wait in game time
-    # assert that energy and skills change accordingly
-    #
+    money_space = Space.new(:money)
+    purchase_vec = Force.new(money_space, :negative, 10)
+    ev1 = Event.new(:purchase, :cs_book, [purchase_vec])
+    ev2 = Event.new(:purchase, :cookie,  [purchase_vec])
+
+    _(Aggregates::Inventory.new([ev1, ev2]).to_s).must_equal(
+      "CS Book * 1 | permanent\nCookie * 10 | consumable"
+    )
+
+    ev3 = Event.new(:schedule, :cs_book, [], { from: '', till: ''})
+    ev4 = Event.new(:schedule, :cookie,  [], { from: '', till: ''})
+
+    ev5 = Events::GameTime.new(:tick, :game_time, [])
+
+    _(Aggregates::Status.new([ev3, ev4, ev5]).to_h).must_equal(
+      {
+        :energy=>80,
+        :money=>90,
+        :goods=>{:cs_book=>1},
+        :skills=>{:cs_skill=>20}
+      }
+    )
+
     # apply for a job
     # assert that it can succeed with the combination of luck and skills
     #

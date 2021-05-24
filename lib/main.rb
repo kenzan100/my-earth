@@ -54,4 +54,5 @@ Force = Struct.new(:space, :direction, :magnitude) do
     magnitude * coefficient
   end
 end
-Event = Struct.new(:name, :forces)
+
+Event = Struct.new(:action, :target, :forces)

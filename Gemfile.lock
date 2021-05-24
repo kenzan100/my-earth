@@ -3,6 +3,7 @@ GEM
   specs:
     dry-cli (0.7.0)
     minitest (5.14.4)
+    zeitwerk (2.4.2)
 
 PLATFORMS
   ruby
@@ -10,6 +11,7 @@ PLATFORMS
 DEPENDENCIES
   dry-cli
   minitest
+  zeitwerk
 
 BUNDLED WITH
    2.1.4
