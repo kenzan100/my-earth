@@ -16,6 +16,9 @@ describe Main do
     @cs_book = Item.new(:cs_book, :permanent)
     @cookie  = Item.new(:cookie, :consumable)
 
+    @cs_book.add_possible_action(:study, [vec1, vec2])
+    @cookie.add_possible_action(:eat, [Force.new(@s2, :positive, 14)])
+
     @events = [
       Events::Event.new(:study, @cs_book, [vec1, vec2]),
       Events::Event.new(:study, @cs_book, [vec1, vec2])
@@ -32,18 +35,23 @@ describe Main do
       "cs_book * 1 | permanent\ncookie * 1 | consumable"
     )
 
-    ev3 = Events::Event.new(:schedule, :cs_book, [], { from: '', till: ''})
-    ev4 = Events::Event.new(:schedule, :cookie,  [], { from: '', till: ''})
+    ev3 = Events::Event.new(:schedule, @cs_book, [], { as: :study, from: '', till: ''})
+    ev4 = Events::Event.new(:schedule, @cookie,  [], { as: :eat,   from: '', till: ''})
 
     ev5 = Events::GameTime.new(:tick, :game_time, [])
+    ev6 = Events::GameTime.new(:tick, :game_time, [])
 
-    _(Aggregates::Status.new([ev3, ev4, ev5]).to_h).must_equal(
+    _(Aggregates::VectorStatus.new([ev3, ev4, ev5, ev6]).to_h).must_equal(
       {
-        :energy=>80,
-        :money=>90,
-        :goods=>{:cs_book=>1},
-        :skills=>{:cs_skill=>20}
+        :cs_skill => 10,
+        :energy   => 9,
       }
+    )
+
+    produced_events = Aggregates::VectorStatus.new([ev3, ev4, ev5, ev6]).call
+    result = Main.new({}, produced_events).call
+    _(Aggregates::Inventory.new([ev1, ev2] + result.side_effects).to_s).must_equal(
+      "cs_book * 1 | permanent\ncookie * 0 | consumable"
     )
 
     # apply for a job
@@ -60,7 +68,7 @@ describe Main do
       @s2 => 0
     }
 
-    result = Main.new(base, @events).resolve
+    result = Main.new(base, @events).call
     _(result.triggered_conditions).must_equal(
       [:game_ends, :game_ends]
     )
@@ -72,7 +80,7 @@ describe Main do
       @s2 => 10
     }
 
-    result = Main.new(base, @events).resolve
+    result = Main.new(base, @events).call
 
     _(result.attributes).must_equal(
       {

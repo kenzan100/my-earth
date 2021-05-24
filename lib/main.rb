@@ -4,15 +4,21 @@ class Main
     @events = events
   end
 
-  Result = Struct.new(:attributes, :triggered_conditions)
+  Result = Struct.new(:attributes, :triggered_conditions, :side_effects)
 
-  def resolve
+  def call
     result_attrs = Hash.new { |h, k| h[k] = 0 }
     result_attrs.merge!(@base)
 
     triggered = []
+    side_effects = []
 
     @events.each do |event|
+      # TODO: extract this to generic reactors
+      if event.target.item_type == :consumable
+        side_effects << Events::Event.new(:consume, event.target)
+      end
+
       event.forces.each do |event_force|
         result_attrs[event_force.space] += event_force.vector
 
@@ -27,7 +33,8 @@ class Main
 
     Result.new(
       result_attrs,
-      triggered
+      triggered,
+      side_effects
     )
   end
 end
