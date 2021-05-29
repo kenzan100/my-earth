@@ -27,7 +27,7 @@ module Aggregates
         end
 
         event.forces.each do |event_force|
-          result_attrs[event_force.space] += event_force.vector
+          result_attrs[event_force.space] += event_force.magnitude
 
           current_val = result_attrs[event_force.space]
           event_force.space.conditions.each do |condition|

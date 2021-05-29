@@ -11,14 +11,14 @@ describe 'Game CLI mode - end to end' do
     @s1 = Constructs::Space.new(:cs_skill)
     @s2 = Constructs::Space.new(:energy)
 
-    vec1 = Constructs::Vector.new(@s1, :positive, 10)
-    vec2 = Constructs::Vector.new(@s2, :negative, 5)
+    vec1 = Constructs::Vector.new(@s1, 10)
+    vec2 = Constructs::Vector.new(@s2, -5)
 
     @cs_book = Static::Item.new(:cs_book, :permanent)
     @cookie  = Static::Item.new(:cookie, :consumable)
 
     @cs_book.add_possible_action(:study, [vec1, vec2])
-    @cookie.add_possible_action(:eat, [Constructs::Vector.new(@s2, :positive, 14)])
+    @cookie.add_possible_action(:eat, [Constructs::Vector.new(@s2, 14)])
 
     @events = [
       Events::Event.new(:study, @cs_book, [vec1, vec2]),
@@ -28,7 +28,7 @@ describe 'Game CLI mode - end to end' do
 
   it "simulates the single game play" do
     money_space = Constructs::Space.new(:money)
-    purchase_vec = Constructs::Vector.new(money_space, :negative, 10)
+    purchase_vec = Constructs::Vector.new(money_space, 10)
 
     ev1 = Events::Event.new(:purchase, @cs_book, [purchase_vec])
     ev2 = Events::Event.new(:purchase, @cookie,  [purchase_vec])
@@ -63,7 +63,8 @@ describe 'Game CLI mode - end to end' do
       :software_engineer,
       30,
       { cs_skill: 10 },
-      { cs_skill: 3 }
+      { cs_skill: 3 },
+      { energy: -10 },
     )
     job_apply = Events::Event.new(:apply, @software_engineer, [])
 
@@ -90,7 +91,7 @@ describe 'Game CLI mode - end to end' do
 
     result = Aggregates::Stats.new({}, produced_events).call
 
-    _(result.to_h).must_equal({ money: 60, cs_skill: 6 })
+    _(result.to_h).must_equal({ money: 60, cs_skill: 6, energy: -20 })
   end
 
   it "terminates if terminating space attr goes zero" do
