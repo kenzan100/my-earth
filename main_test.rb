@@ -59,16 +59,38 @@ describe 'Game CLI mode - end to end' do
       "cs_book * 1 | permanent\ncookie * 0 | consumable"
     )
 
-    @software_engineer = Static::Job.new(:software_engineer, 30)
+    @software_engineer = Static::Job.new(
+      :software_engineer,
+      30,
+      { cs_skill: 10 },
+      { cs_skill: 3 }
+    )
     job_apply = Events::Event.new(:apply, @software_engineer, [])
 
+    fail = Aggregates::JobApplication.new([job_apply]).call
+    _(fail.bool).must_equal(false)
 
-    # apply for a job
-    # assert that it can succeed with the combination of luck and skills
-    #
-    # schedule a job
-    # wait in game time
-    # assert money and energy and skills change accordingly
+    success = Aggregates::JobApplication.new(produced_events + [job_apply]).call
+    _(success.bool).must_equal(true)
+
+    work = Events::Event.new(:schedule, @software_engineer, [], { as: :work,   from: '', till: ''})
+
+    # ev5 and ev6 are before the work event time
+    produced_events = Aggregates::TimeProgress.new([work, ev5, ev6]).call
+    _(produced_events.empty?).must_equal true
+
+    ev7 = Events::GameTime.new(:tick, :game_time, [])
+    ev8 = Events::GameTime.new(:tick, :game_time, [])
+    ev9 = Events::GameTime.new(:tick, :game_time, [])
+
+    produced_events = Aggregates::TimeProgress.new([work, ev7, ev8, ev9]).call
+    _(produced_events.length).must_equal 2
+    _(produced_events.first.action).must_equal :work
+    _(produced_events.first.target).must_equal @software_engineer
+
+    result = Aggregates::Stats.new({}, produced_events).call
+
+    _(result.to_h).must_equal({ money: 60, cs_skill: 6 })
   end
 
   it "terminates if terminating space attr goes zero" do

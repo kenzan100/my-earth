@@ -14,9 +14,13 @@ module Aggregates
 
         schedules_at_t = Aggregates::Schedule.new(schedules).at(t)
         schedules_at_t.each do |schedule_event|
-          item = schedule_event.target
-          vectors = item.search(schedule_event.scheduled_action)
-          produced_events << Events::Event.new(schedule_event.scheduled_action, item, vectors)
+          item_or_job = schedule_event.target
+          vectors = item_or_job.search(schedule_event.scheduled_action)
+          produced_events << Events::Event.new(
+            schedule_event.scheduled_action,
+            item_or_job,
+            vectors
+          )
         end
       end
 
