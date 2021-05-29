@@ -1,5 +1,5 @@
 module Aggregates
-  class VectorStatus
+  class TimeProgress
     def initialize(events)
       @events = events
     end
@@ -21,13 +21,6 @@ module Aggregates
       end
 
       produced_events
-    end
-
-    def to_h(base = {})
-      result = Main.new({}, call).call
-      result.attributes.each_with_object({}) do |(space, val), hash|
-        hash[space.name] = val
-      end
     end
   end
 end
