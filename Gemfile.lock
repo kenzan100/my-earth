@@ -2,7 +2,13 @@ GEM
   remote: https://rubygems.org/
   specs:
     dry-cli (0.7.0)
+    faraday (1.2.0)
+      multipart-post (>= 1.2, < 3)
+      ruby2_keywords
     minitest (5.14.4)
+    multipart-post (2.1.1)
+    rack (2.2.3)
+    ruby2_keywords (0.0.4)
     zeitwerk (2.4.2)
 
 PLATFORMS
@@ -10,7 +16,9 @@ PLATFORMS
 
 DEPENDENCIES
   dry-cli
+  faraday
   minitest
+  rack
   zeitwerk
 
 BUNDLED WITH

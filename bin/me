@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'dry/cli'
+require 'faraday'
 
 FIXTURES = {
   cs_book: {
@@ -12,6 +13,8 @@ FIXTURES = {
     }
   }
 }
+
+URL_HOST = 'http://localhost:9292/'
 
 module MyEarth
   module MyJob
@@ -31,7 +34,9 @@ module MyEarth
             puts goods
           else
             puts "trying to purchase #{action}"
-            # do purchase
+
+            res = Faraday.get(URL_HOST + 'purchase')
+            puts res.body
           end
         end
       end

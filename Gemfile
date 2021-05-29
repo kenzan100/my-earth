@@ -2,6 +2,11 @@ source "https://rubygems.org"
 
 gem "minitest"
 
-gem 'dry-cli'
-
 gem 'zeitwerk'
+
+# Client
+gem 'dry-cli'
+gem 'faraday'
+
+# Server
+gem 'rack'
