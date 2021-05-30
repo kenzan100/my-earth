@@ -7,19 +7,15 @@ module Aggregates
 
     Result = Struct.new(:attributes, :inventory, :violations, :side_effects) do
       def to_h
-        attrs = attributes.each_with_object({}) do |(space, val), hash|
-          hash[space.name] = val
-        end
-
         {
-          stats: attrs,
+          stats: attributes,
           inventory: inventory.to_s
         }
       end
     end
 
     def call
-      result_attrs = Hash.new { |h, k| h[k] = 0 }
+      result_attrs = {}
       result_attrs.merge!(@base)
 
       triggered = []
@@ -32,9 +28,15 @@ module Aggregates
         end
 
         event.forces.each do |event_force|
-          result_attrs[event_force.space] += event_force.magnitude
+          # NOTE: better to be limit the scope of default write
+          unless result_attrs[event_force.space.name]
+            result_attrs[event_force.space.name] = 0
+          end
 
-          current_val = result_attrs[event_force.space]
+          result_attrs[event_force.space.name] += event_force.magnitude
+
+          current_val = result_attrs[event_force.space.name]
+
           event_force.space.conditions.each do |condition|
             if condition.rule.call(current_val)
               triggered << condition.event_name

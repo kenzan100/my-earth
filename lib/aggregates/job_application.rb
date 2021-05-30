@@ -14,16 +14,16 @@ module Aggregates
     def call(luck_percentage: 0)
       return Result.new(false, []) unless @job_event
 
-      stats = Aggregates::Stats.new({}, @events).call.to_h
+      result = Aggregates::Stats.new({}, @events).call
 
-      chances = @job_event.target.apply_success_vectors.each_with_object([]) do |(space_name, required_amount), chances|
-        unless stats[space_name]
+      chances = @job_event.target.apply_success_vectors.each_with_object([]) do |vector, chances|
+        unless result.attributes[vector.space.name]
           chances << 0
           next
         end
 
-        missing = required_amount - stats[space_name]
-        missing_percentage = missing.to_f / required_amount
+        missing = vector.magnitude - result.attributes[vector.space.name]
+        missing_percentage = missing.to_f / vector.magnitude
 
         chances << (1 - missing_percentage)
       end

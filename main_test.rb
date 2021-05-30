@@ -104,7 +104,12 @@ describe 'Game CLI mode - end to end' do
 
     result = Aggregates::Stats.new({}, produced_events).call
 
-    _(result.to_h).must_equal({ money: 60, cs_skill: 6, energy: -20 })
+    _(result.to_h).must_equal(
+      {
+        stats: { money: 60, cs_skill: 6, energy: -20 },
+        inventory: ""
+      }
+    )
   end
 
   it "terminates if terminating space attr goes zero" do
@@ -121,16 +126,16 @@ describe 'Game CLI mode - end to end' do
 
   it "calculates the attributes given events" do
     base = {
-      @s1 => 0,
-      @s2 => 10
+      @s1.name => 0,
+      @s2.name => 10
     }
 
     result = Aggregates::Stats.new(base, @events).call
 
     _(result.attributes).must_equal(
       {
-        @s1 => 20,
-        @s2 => 0,
+        @s1.name => 20,
+        @s2.name => 0,
       }
     )
   end

@@ -26,7 +26,7 @@ end
 
 module Game
   EVENTS = []
-  STATS = { World::MONEY_SPACE => 25 }
+  STATS = { World::MONEY_SPACE.name => 25 }
 end
 
 module Constants
