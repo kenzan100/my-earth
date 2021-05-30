@@ -16,5 +16,9 @@ module Events
 
       @options[:as]
     end
+
+    def override(**attrs)
+      @action = attrs[:action] if attrs[:action]
+    end
   end
 end

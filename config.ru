@@ -3,40 +3,54 @@ require 'json'
 require 'zeitwerk'
 loader = Zeitwerk::Loader.new
 loader.push_dir("#{__dir__}/lib")
+loader.push_dir("#{__dir__}/web")
+loader.enable_reloading
 loader.setup
 
-EVENTS = []
+module World
+  MONEY_SPACE = Constructs::Space.new(:money)
+  PURCHASE_VEC = Constructs::Vector.new(MONEY_SPACE, -10)
 
-COOKIE  = Static::Item.new(:cookie, :consumable)
-MONEY_SPACE = Constructs::Space.new(:money)
-PURCHASE_VEC = Constructs::Vector.new(MONEY_SPACE, 10)
+  MONEY_SPACE.add_violation(
+    ->(val) { val < 0 },
+    :money_cannot_go_below_zero
+  )
 
-JSON_TYPE =  { 'Content-Type' => 'application/json' }
+  COOKIE = Static::Item.new(:cookie, :consumable)
+  COOKIE.add_possible_action(:purchase, [PURCHASE_VEC])
 
-class PurchaseHandler
-  def call(env)
-    event = Events::Event.new(
-      :purchase,
-      COOKIE,
-      [PURCHASE_VEC]
-    )
-    EVENTS << event
+  ITEMS = {
+    cookie: COOKIE
+  }
+end
 
-    body = Aggregates::Inventory.new(EVENTS).to_s
+module Game
+  EVENTS = []
+  STATS = { World::MONEY_SPACE => 25 }
+end
 
-    [
-      200,
-      JSON_TYPE,
-      [ { inventory: body }.to_json ]
-    ]
-  end
+module Constants
+  JSON_TYPE =  { 'Content-Type' => 'application/json' }
 end
 
 app = Rack::Builder.new do
   use Rack::ShowExceptions
 
   map "/purchase" do
-    run PurchaseHandler.new
+    loader.reload
+    run PurchaseHandler.new(Game::EVENTS)
+  end
+
+  map "/stats" do
+    run ->(env) do
+      [
+        200,
+        Constants::JSON_TYPE,
+        [
+          Aggregates::Stats.new(Game::STATS, Game::EVENTS).call.to_h.to_json
+        ]
+      ]
+    end
   end
 end
 

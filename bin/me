@@ -24,18 +24,18 @@ module MyEarth
       class Purchase < Dry::CLI::Command
         desc "Purchase goods"
 
-        argument :action, required: true, desc: "The name of goods for purchase. list to see the available goods."
+        argument :target, required: true, desc: "The name of goods for purchase. list to see the available goods."
 
-        def call(action:, **)
+        def call(target:, **)
           goods = [
             FIXTURES[:cs_book]
           ]
-          if action == 'list'
+          if target == 'list'
             puts goods
           else
-            puts "trying to purchase #{action}"
+            puts "trying to purchase #{target}.."
 
-            res = Faraday.get(URL_HOST + 'purchase')
+            res = Faraday.get(URL_HOST + "purchase?target=#{target}")
             puts res.body
           end
         end
@@ -114,11 +114,10 @@ module MyEarth
         desc "See current stats"
 
         def call(input: nil, **)
-          # puts @stats TODO prepare in-memory states
-          @stats  = { energy: 80, money: 90 }
-          @goods  = { cs_book: 1 }
-          @skills = { cs_skill: 20 }
-          puts(@stats.merge(goods: @goods, skills: @skills))
+          puts "reading latest stats.."
+
+          res = Faraday.get(URL_HOST + "stats")
+          puts res.body
         end
       end
 

@@ -6,6 +6,14 @@ loader = Zeitwerk::Loader.new
 loader.push_dir("#{__dir__}/lib")
 loader.setup
 
+describe Events::Event do
+  it 'overrides' do
+    ev = Events::Event.new(:purchase, :target)
+    ev.override(action: :invalid, hoge: :fuga)
+    _(ev.action).must_equal(:invalid)
+  end
+end
+
 describe 'Game CLI mode - end to end' do
   before do
     @s1 = Constructs::Space.new(:cs_skill)
@@ -33,7 +41,7 @@ describe 'Game CLI mode - end to end' do
     ev1 = Events::Event.new(:purchase, @cs_book, [purchase_vec])
     ev2 = Events::Event.new(:purchase, @cookie,  [purchase_vec])
 
-    _(Aggregates::Inventory.new([ev1, ev2]).to_s).must_equal(
+    _(Aggregates::Inventory.new([ev1, ev2]).call.to_s).must_equal(
       "cs_book * 1 | permanent\ncookie * 1 | consumable"
     )
 
@@ -50,12 +58,17 @@ describe 'Game CLI mode - end to end' do
 
     result = Aggregates::Stats.new({}, produced_events).call
 
-    _(result.to_h).must_equal({ cs_skill: 10, energy: 9 })
+    _(result.to_h).must_equal(
+      {
+        stats: { cs_skill: 10, energy: 9 },
+        inventory: ""
+      }
+    )
 
     _(result.side_effects.first.action).must_equal :consume
     _(result.side_effects.first.target).must_equal @cookie
 
-    _(Aggregates::Inventory.new([ev1, ev2] + result.side_effects).to_s).must_equal(
+    _(Aggregates::Inventory.new([ev1, ev2] + result.side_effects).call.to_s).must_equal(
       "cs_book * 1 | permanent\ncookie * 0 | consumable"
     )
 
@@ -95,13 +108,13 @@ describe 'Game CLI mode - end to end' do
   end
 
   it "terminates if terminating space attr goes zero" do
-    @s2.add_condition(->(v) { v < 0 }, :game_ends)
+    @s2.add_violation(->(v) { v < 0 }, :game_ends)
     base = {
       @s2 => 0
     }
 
     result = Aggregates::Stats.new(base, @events).call
-    _(result.triggered_conditions).must_equal(
+    _(result.violations).must_equal(
       [:game_ends, :game_ends]
     )
   end

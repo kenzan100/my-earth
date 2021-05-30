@@ -5,11 +5,16 @@ module Aggregates
       @events = events
     end
 
-    Result = Struct.new(:attributes, :triggered_conditions, :side_effects) do
+    Result = Struct.new(:attributes, :inventory, :violations, :side_effects) do
       def to_h
-        attributes.each_with_object({}) do |(space, val), hash|
+        attrs = attributes.each_with_object({}) do |(space, val), hash|
           hash[space.name] = val
         end
+
+        {
+          stats: attrs,
+          inventory: inventory.to_s
+        }
       end
     end
 
@@ -38,8 +43,11 @@ module Aggregates
         end
       end
 
+      inventory = Aggregates::Inventory.new(@events).call
+
       Result.new(
         result_attrs,
+        inventory,
         triggered,
         side_effects
       )

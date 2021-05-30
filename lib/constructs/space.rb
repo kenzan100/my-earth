@@ -10,7 +10,7 @@ module Constructs
       @conditions = []
     end
 
-    def add_condition(rule, event_name)
+    def add_violation(rule, event_name)
       @conditions << Condition.new(rule, event_name)
     end
   end
