@@ -85,6 +85,11 @@ module MyEarth
 
         def call(allocatable: nil, start_time: nil, end_time: nil, **)
           if [allocatable, start_time, end_time].none?
+            'reading your current schedule..'
+
+            res = Faraday.get(URL_HOST + "schedule")
+            puts res.body
+
             @my_schedule = [
               " 9 - 10 | Eat Cookie (energy +5)",
               "10 - 12 | Study CS Book (cs_skill +20, energy -10)"

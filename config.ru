@@ -41,6 +41,11 @@ app = Rack::Builder.new do
     run PurchaseHandler.new(Game::EVENTS)
   end
 
+  map "/schedule" do
+    loader.reload
+    run ScheduleHandler.new(Game::EVENTS)
+  end
+
   map "/stats" do
     run ->(env) do
       [

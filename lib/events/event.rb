@@ -17,6 +17,19 @@ module Events
       @options[:as]
     end
 
+    def scheduled_duration
+      raise unless @action == :schedule
+
+      (@options[:from]...@options[:till])
+    end
+
+    def overlaps?(other)
+      raise if @action != :schedule || other.action != :schedule
+
+      scheduled_duration.cover?(other.scheduled_duration.first) ||
+        other.scheduled_duration.cover?(scheduled_duration.first)
+    end
+
     def override(**attrs)
       @action = attrs[:action] if attrs[:action]
     end
