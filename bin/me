@@ -80,28 +80,35 @@ module MyEarth
         desc "Schedule your day"
 
         argument :allocatable
+        argument :action
         argument :start_time
         argument :end_time
 
-        def call(allocatable: nil, start_time: nil, end_time: nil, **)
-          if [allocatable, start_time, end_time].none?
-            'reading your current schedule..'
+        def call(allocatable: nil, action: nil, start_time: nil, end_time: nil, **)
+          if [allocatable, action, start_time, end_time].none?
+            puts 'reading your current schedule..'
 
             res = Faraday.get(URL_HOST + "schedule")
             puts res.body
 
-            @my_schedule = [
-              " 9 - 10 | Eat Cookie (energy +5)",
-              "10 - 12 | Study CS Book (cs_skill +20, energy -10)"
-            ]
-            puts @my_schedule
             return
           end
 
-          if allocatable && start_time && end_time
-            puts "Scheduled #{allocatable} from #{start_time} till #{end_time}"
+          if allocatable && action && start_time && end_time
+            puts "Scheduling #{action} #{allocatable} from #{start_time} till #{end_time}..."
+
+            res = Faraday.get(
+              URL_HOST +
+                "schedule?"+
+                "target=#{allocatable}&"+
+                "scheduled_action=#{action}&"+
+                "scheduled_time_from=#{start_time}&"+
+                "scheduled_time_till=#{end_time}"
+            )
+            puts res.body
+
           else
-            puts "Usage: \"me schedule ALLOCATABLE START_TIME END_TIME\""
+            puts "Usage: \"me schedule ALLOCATABLE ACTION START_TIME END_TIME\""
           end
         end
       end

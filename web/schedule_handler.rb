@@ -9,57 +9,89 @@ class ScheduleHandler
     if req.params.empty?
       return [
         200,
-        Constants::JSON_TYPE,
-        [ { schedule: Aggregates::Schedule.new(@events) }.to_json ]
+        Constants::TEXT_TYPE,
+        [ Aggregates::Schedule.new(@events).call.to_s ]
       ]
     end
 
     target_name = req.params['target'].to_sym
-
     item = World::ITEMS[target_name]
+    return CommonResponse.not_found(target_name) unless item
 
-    return not_found(target_name) unless item
+    schedule_parsed = parse_params(req.params)
+    unless schedule_parsed.violations.empty?
+      return CommonResponse.unprocessable(schedule_parsed.violations)
+    end
 
     event = Events::Event.new(
-      :purchase,
+      :schedule,
       item,
-      item.search(:purchase) || []
+      item.search(:schedule) || [],
+      schedule_parsed.event_option
     )
 
-    result = Aggregates::Stats.new(Game::STATS, @events + [event]).call
+    @events << event
 
-    if result.violations.empty?
-      @events << event
-      return success(result)
-    else
-      @events << Events::Event.new(:invalid_purchase, item, [])
-      return unprocessable(result)
-    end
+    return [
+      200,
+      { 'Content-Type' => 'text/plain' },
+      [ Aggregates::Schedule.new(@events).call.to_s ]
+    ]
+
+    # result = Aggregates::Stats.new(Game::STATS, @events + [event]).call
+    #
+    # if result.violations.empty?
+    #   @events << event
+    #   return CommonResponse.success(result)
+    # else
+    #   @events << Events::Event.new(:invalid_purchase, item, [])
+    #   return CommonResponse.unprocessable(result.violations)
+    # end
   end
 
   private
 
-  def success(result)
-    [
-      200,
-      Constants::JSON_TYPE,
-      [ result.to_h.to_json ]
-    ]
+  ParsedSchedule = Struct.new(:action, :time_from, :time_till)
+  Parsed = Struct.new(:violations, :result) do
+    def event_option
+      {
+        as: result.action,
+        from: result.time_from,
+        till: result.time_till
+      }
+    end
   end
 
-  def unprocessable(result)
-    [
-      422,
-      Constants::JSON_TYPE,
-      [ { error: result.violations }.to_json ]
-    ]
-  end
+  # TODO schedule prob. can only be a vector space on its own
+  # so that validations/side effects can be expressed uniformly
+  def parse_params(params)
+    violations = []
 
-  def not_found(target_name)
-    [
-      404,
-      Constants::JSON_TYPE,
-      [ { error: "#{target_name} not found in list of items"}.to_json ]
-    ]
+    unless [
+      params['scheduled_action'],
+      params['scheduled_time_from'],
+      params['scheduled_time_till'],
+    ].all? { |fragment| fragment.is_a?(String) }
+      pp params['scheduled_action']
+      pp params['scheduled_time_from']
+      pp params['scheduled_time_till']
+      violations << "missing attribute: send all of scheduled_action, scheduled_time_from, and scheduled_time_till"
+      return Parsed.new(violations, nil)
+    end
+
+    unless params['scheduled_time_from'].to_i.between?(0, 24) &&
+      params['scheduled_time_till'].to_i.between?(0, 24)
+      violations << "scheduled_time_from and scheduled_time_till needs to be within 0 ~ 24 range"
+      return Parsed.new(violations, nil)
+    end
+
+    Parsed.new(
+      violations,
+      ParsedSchedule.new(
+        params['scheduled_action'].to_sym,
+        params['scheduled_time_from'].to_i,
+        params['scheduled_time_till'].to_i
+      )
+    )
   end
 end

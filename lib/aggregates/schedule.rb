@@ -17,6 +17,8 @@ module Aggregates
       end
     end
 
+    # TODO schedule prob. can only be a vector space on its own
+    # so that validations/side effects can be expressed uniformly
     def call
       schedules = []
       relevant_events.each do |ev|
