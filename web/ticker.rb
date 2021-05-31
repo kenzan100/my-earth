@@ -48,7 +48,7 @@ class Ticker
 
       elapsed = Time.now
       loop do
-        _sender, speed = Ractor.select(Ractor.current, filler.tap { |f| f << 'noop-speed' })
+        # _sender, speed = Ractor.select(Ractor.current, filler.tap { |f| f << 'noop-speed' })
         if speed.is_a?(Numeric)
           current_speed = speed
         end

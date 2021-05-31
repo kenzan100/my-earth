@@ -31,6 +31,8 @@ end
 module Game
   EVENTS = []
   STATS = { World::MONEY_SPACE.name => 25 }
+  TICKER = Ticker.new
+  TICKER.change_speed(1000) # 1 hour game time elapses 1000x faster than real time
 end
 
 module Constants

@@ -15,6 +15,15 @@ module Aggregates
     end
 
     def call
+      # Game::TICKER.reads_till_fully_read.map do |(tick_time, speed)|
+      #   tick_event = Events::GameTime.new(:tick, :game_time, [], { when: tick_time })
+      #   @events << tick_event
+      # end
+      #
+      # Aggregates::TimeProgress.new(@events).call.each do |produced_event|
+      #   @events << produced_event
+      # end
+
       result_attrs = {}
       result_attrs.merge!(@base)
 
@@ -43,6 +52,10 @@ module Aggregates
             end
           end
         end
+      end
+
+      side_effects.each do |side_effect_event|
+        @events << side_effect_event
       end
 
       inventory = Aggregates::Inventory.new(@events).call
