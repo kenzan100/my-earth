@@ -9,6 +9,7 @@ GEM
     multipart-post (2.1.1)
     rack (2.2.3)
     ruby2_keywords (0.0.4)
+    webrick (1.7.0)
     zeitwerk (2.4.2)
 
 PLATFORMS
@@ -19,7 +20,8 @@ DEPENDENCIES
   faraday
   minitest
   rack
+  webrick
   zeitwerk
 
 BUNDLED WITH
-   2.1.4
+   2.2.15

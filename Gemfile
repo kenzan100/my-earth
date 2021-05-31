@@ -10,3 +10,4 @@ gem 'faraday'
 
 # Server
 gem 'rack'
+gem 'webrick'
