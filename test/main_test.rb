@@ -1,12 +1,4 @@
-require "minitest/autorun"
-require "pp"
-
-require "zeitwerk"
-loader = Zeitwerk::Loader.new
-loader.push_dir("#{__dir__}/lib")
-loader.setup
-
-require_relative 'test_helper'
+require_relative 'test_setup'
 
 describe Events::Event do
   it 'overrides' do
