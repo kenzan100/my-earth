@@ -19,7 +19,8 @@ module Aggregates
           produced_events << Events::Event.new(
             schedule_event.scheduled_action,
             item_or_job,
-            vectors
+            vectors,
+            { when: t.registered_at + 1 }
           )
         end
       end

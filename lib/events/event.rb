@@ -8,7 +8,7 @@ module Events
       @forces = forces
       @options = options
 
-      @registered_at = Time.now
+      @registered_at = options[:when] || Time.now
     end
 
     def scheduled_action
