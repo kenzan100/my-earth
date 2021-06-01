@@ -2,11 +2,9 @@ module Aggregates
   class JobApplication
     # TODO: make sure stats at the time of job apply event is used,
     #       not every single event that's passed in.
-    def initialize(events)
+    def initialize(job_event, events)
       @events = events
-      @job_event = events.find do |ev|
-        ev.action == :apply && ev.target.is_a?(Static::Job)
-      end
+      @job_event = job_event
     end
 
     Result = Struct.new(:bool, :side_effects)

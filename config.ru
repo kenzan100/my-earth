@@ -18,11 +18,22 @@ module World
   CONSUME_VEC = Constructs::Vector.new(COOKIE_SPACE, -1)
   PURCHASE_COOKIE_VEC = Constructs::Vector.new(COOKIE_SPACE, 1)
 
+  JOB_SPACE = Constructs::Space.new(:software_engineer)
+
+  CS_SKILL_SPACE = Constructs::Space.new(:cs_skill)
+
+  JOB_SPACE.add_violation(
+    ->(val) { val != Float::INFINITY },
+    :you_are_not_hired_as_software_engineer_yet
+  )
   COOKIE_SPACE.add_violation(
     ->(val) { val < 0 },
     :cookie_cannot_be_below_zero
   )
-
+  ENERGY_SPACE.add_violation(
+    ->(val) { val < 0 },
+    :i_am_too_tired
+  )
   MONEY_SPACE.add_violation(
     ->(val) { val < 0 },
     :money_cannot_go_below_zero
@@ -32,8 +43,24 @@ module World
   COOKIE.add_possible_action(:purchase, [PURCHASE_VEC, PURCHASE_COOKIE_VEC])
   COOKIE.add_possible_action(:eat, [EAT_VEC, CONSUME_VEC])
 
+  SOFTWARE_ENGINEER = Static::Job.new(
+    :software_engineer,
+    30,
+    { CS_SKILL_SPACE => 10 },
+    { CS_SKILL_SPACE => 3 },
+    { ENERGY_SPACE => -10 }
+  )
+  SOFTWARE_ENGINEER.add_possible_action(
+    :hired,
+    [Constructs::Vector.new(JOB_SPACE, Float::INFINITY)]
+  )
+
   ITEMS = {
     cookie: COOKIE
+  }
+
+  JOBS = {
+    software_engineer: SOFTWARE_ENGINEER
   }
 end
 
@@ -61,6 +88,11 @@ app = Rack::Builder.new do
   map "/schedule" do
     loader.reload
     run ScheduleHandler.new(Game::EVENTS)
+  end
+
+  map "/apply" do
+    loader.reload
+    run ApplyHandler.new(Game::EVENTS)
   end
 
   map "/stats" do

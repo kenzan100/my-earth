@@ -14,25 +14,30 @@ module Static
       @skill_growth_vectors = parse_vector_indication(skill_growth_vectors)
       @work_stress_vectors = parse_vector_indication(stress_vectors)
 
-      @money_space = Constructs::Space.new(:money)
-      @work_vec = Constructs::Vector.new(@money_space, @hourly_usd)
+      @work_vec = Constructs::Vector.new(World::MONEY_SPACE, @hourly_usd)
+      @hired_vec = Constructs::Vector.new(World::JOB_SPACE, 0)
+
+      @action_dict = {
+        work: [@work_vec, @hired_vec] + @skill_growth_vectors + @work_stress_vectors
+      }
     end
 
     def item_type
       :permanent
     end
 
+    def add_possible_action(action_name, vectors)
+      @action_dict[action_name] = vectors
+    end
+
     def search(action)
-      {
-        work: [@work_vec] + @skill_growth_vectors + @work_stress_vectors
-      }[action]
+      @action_dict[action]
     end
 
     private
 
     def parse_vector_indication(vector_indication_hash)
-      vector_indication_hash.each_with_object([]) do |(space_name, vector_amount), vectors|
-        space = Constructs::Space.new(space_name)
+      vector_indication_hash.each_with_object([]) do |(space, vector_amount), vectors|
         vectors << Constructs::Vector.new(space, vector_amount)
       end
     end

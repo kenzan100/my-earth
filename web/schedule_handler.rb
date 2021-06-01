@@ -15,8 +15,8 @@ class ScheduleHandler
     end
 
     target_name = req.params['target'].to_sym
-    item = World::ITEMS[target_name]
-    return CommonResponse.not_found(target_name) unless item
+    allocatable = World::ITEMS[target_name] || World::JOBS[target_name]
+    return CommonResponse.not_found(target_name) unless allocatable
 
     schedule_parsed = parse_params(req.params)
     unless schedule_parsed.violations.empty?
@@ -25,8 +25,8 @@ class ScheduleHandler
 
     event = Events::Event.new(
       :schedule,
-      item,
-      item.search(:schedule) || [],
+      allocatable,
+      allocatable.search(:schedule) || [],
       schedule_parsed.event_option
     )
 
@@ -37,16 +37,6 @@ class ScheduleHandler
       { 'Content-Type' => 'text/plain' },
       [ Aggregates::Schedule.new(@events).call.to_s ]
     ]
-
-    # result = Aggregates::Stats.new(Game::STATS, @events + [event]).call
-    #
-    # if result.violations.empty?
-    #   @events << event
-    #   return CommonResponse.success(result)
-    # else
-    #   @events << Events::Event.new(:invalid_purchase, item, [])
-    #   return CommonResponse.unprocessable(result.violations)
-    # end
   end
 
   private

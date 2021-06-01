@@ -59,17 +59,25 @@ module MyEarth
 
         def call(action: nil, job_id: nil, **)
           @available_jobs = {
-            1 => "1 | Software engineer    | $30 / hour",
-            2 => "2 | McDonald's part-time | $10 / hour",
+            1 => {
+              name: :software_engineer,
+              string: "1 | Software engineer    | $30 / hour"
+            },
+            2 => {
+              name: :mcdonald_part_time,
+              string: "2 | McDonald's part-time | $10 / hour"
+            }
           }
 
           unless action
-            puts @available_jobs.values
+            puts @available_jobs.map { |_, v| v[:string] }
             return
           end
 
-          if action && job_id
-            puts "Applying for #{@available_jobs[job_id.to_i]}"
+          if action && job_id && found = @available_jobs[job_id.to_i]
+            puts "Applying for #{found[:string]}.."
+            res = Faraday.get(URL_HOST + "apply?target=#{found[:name]}")
+            puts res.body
           else
             puts "Usage: \"me jobs ACTION JOB_ID\""
           end

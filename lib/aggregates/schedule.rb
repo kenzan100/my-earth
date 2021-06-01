@@ -7,7 +7,7 @@ module Aggregates
     Result = Struct.new(:current_schedule) do
       def to_s
         current_schedule.map do |schedule|
-          vectors = schedule.target.search(schedule.scheduled_action)
+          vectors = schedule.target.search(schedule.scheduled_action) || []
           duration = schedule.scheduled_duration
 
           "#{duration.first.to_s.rjust(2)} - #{duration.last.to_s.rjust(2)} " +

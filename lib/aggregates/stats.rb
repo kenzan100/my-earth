@@ -1,3 +1,5 @@
+require 'byebug'
+
 module Aggregates
   class Stats
     def initialize(base, events, speed_change_events)
@@ -9,7 +11,7 @@ module Aggregates
     Result = Struct.new(:attributes, :violations) do
       def to_h
         {
-          stats: attributes,
+          stats: attributes.transform_values { |v| v.to_s },
           violations: violations.uniq
         }
       end
@@ -18,7 +20,8 @@ module Aggregates
     def call
       tick_events = TickGenerator.new(events: @speed_change_events).call
 
-      produced_events = Aggregates::TimeProgress.new(tick_events + @events).call
+      progress_result = Aggregates::TimeProgress.new(tick_events + @events).call
+      produced_events = progress_result.events
 
       result_attrs = {}
       result_attrs.merge!(@base)
@@ -32,11 +35,11 @@ module Aggregates
       end
 
       pp "#{tick_events.length} hours passed.."
-      pp triggered
+      pp triggered + progress_result.violations
 
       Result.new(
         result_attrs,
-        triggered
+        triggered + progress_result.violations
       )
     end
 
