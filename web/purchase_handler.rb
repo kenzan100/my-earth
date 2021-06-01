@@ -22,12 +22,7 @@ class PurchaseHandler
       Game::SPEED_CHANGE_EVENTS
     ).call
 
-    if result.violations.empty?
-      @events << event
-      return CommonResponse.success(result)
-    else
-      @events << Events::Event.new(:invalid_purchase, item, [])
-      return CommonResponse.unprocessable(result.violations)
-    end
+    @events << event
+    CommonResponse.success(result)
   end
 end

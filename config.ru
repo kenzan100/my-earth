@@ -14,14 +14,23 @@ module World
   ENERGY_SPACE = Constructs::Space.new(:energy)
   EAT_VEC = Constructs::Vector.new(ENERGY_SPACE, 10)
 
+  COOKIE_SPACE = Constructs::Space.new(:cookie)
+  CONSUME_VEC = Constructs::Vector.new(COOKIE_SPACE, -1)
+  PURCHASE_COOKIE_VEC = Constructs::Vector.new(COOKIE_SPACE, 1)
+
+  COOKIE_SPACE.add_violation(
+    ->(val) { val < 0 },
+    :cookie_cannot_be_below_zero
+  )
+
   MONEY_SPACE.add_violation(
     ->(val) { val < 0 },
     :money_cannot_go_below_zero
   )
 
   COOKIE = Static::Item.new(:cookie, :consumable)
-  COOKIE.add_possible_action(:purchase, [PURCHASE_VEC])
-  COOKIE.add_possible_action(:eat, [EAT_VEC])
+  COOKIE.add_possible_action(:purchase, [PURCHASE_VEC, PURCHASE_COOKIE_VEC])
+  COOKIE.add_possible_action(:eat, [EAT_VEC, CONSUME_VEC])
 
   ITEMS = {
     cookie: COOKIE
