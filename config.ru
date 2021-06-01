@@ -30,7 +30,10 @@ end
 
 module Game
   EVENTS = []
+  SPEED_CHANGE_EVENTS = []
   STATS = { World::MONEY_SPACE.name => 25 }
+  START_TIME = Time.now
+  LAST_STATS_PROCESSED_AT = { val: START_TIME }
 end
 
 module Constants
@@ -57,7 +60,9 @@ app = Rack::Builder.new do
         200,
         Constants::JSON_TYPE,
         [
-          Aggregates::Stats.new(Game::STATS, Game::EVENTS).call.to_h.to_json
+          Aggregates::Stats.new(
+            Game::STATS, Game::EVENTS, Game::SPEED_CHANGE_EVENTS
+          ).call.to_h.to_json
         ]
       ]
     end

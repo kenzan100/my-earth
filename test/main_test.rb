@@ -62,7 +62,7 @@ describe 'Game CLI mode - end to end' do
     _(produced_events.group_by(&:action)[:study].first.target).must_equal @cs_book
     _(produced_events.group_by(&:action)[:eat].first.target).must_equal @cookie
 
-    result = Aggregates::Stats.new({}, produced_events).call
+    result = Aggregates::Stats.new({}, produced_events, []).call
 
     _(result.to_h).must_equal(
       {
@@ -108,7 +108,7 @@ describe 'Game CLI mode - end to end' do
     _(produced_events.first.action).must_equal :work
     _(produced_events.first.target).must_equal @software_engineer
 
-    result = Aggregates::Stats.new({}, produced_events).call
+    result = Aggregates::Stats.new({}, produced_events, []).call
 
     _(result.to_h).must_equal(
       {
@@ -120,7 +120,7 @@ describe 'Game CLI mode - end to end' do
 
   it "terminates if terminating space attr goes zero" do
     base = {  energy: 0 }
-    result = Aggregates::Stats.new(base, @events).call
+    result = Aggregates::Stats.new(base, @events, []).call
     _(result.violations).must_equal(
       [:game_ends, :game_ends]
     )

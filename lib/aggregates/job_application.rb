@@ -14,7 +14,7 @@ module Aggregates
     def call(luck_percentage: 0)
       return Result.new(false, []) unless @job_event
 
-      result = Aggregates::Stats.new({}, @events).call
+      result = Aggregates::Stats.new({}, @events, []).call
 
       chances = @job_event.target.apply_success_vectors.each_with_object([]) do |vector, chances|
         unless result.attributes[vector.space.name]

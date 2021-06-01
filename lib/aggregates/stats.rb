@@ -1,8 +1,9 @@
 module Aggregates
   class Stats
-    def initialize(base, events)
+    def initialize(base, events, speed_change_events)
       @base = base
       @events = events
+      @speed_change_events = speed_change_events
     end
 
     Result = Struct.new(:attributes, :inventory, :violations, :side_effects) do
@@ -15,15 +16,24 @@ module Aggregates
     end
 
     def call
+      tick_events = TickGenerator.new(events: @speed_change_events).call
+
+      Aggregates::TimeProgress.new(tick_events + @events).call.each do |produced_event|
+        @events << produced_event
+      end
+
       result_attrs = {}
       result_attrs.merge!(@base)
 
       triggered = []
       side_effects = []
 
-      @events.each do |event|
+
+      events_to_process = @events.reject { |eve| eve.registered_at < Game::LAST_STATS_PROCESSED_AT[:val] }
+
+      events_to_process.each do |event|
         # TODO: extract this to generic reactors
-        if event.target.item_type == :consumable
+        if event.target.item_type == :consumable && event.action != :schedule
           side_effects << Events::Event.new(:consume, event.target)
         end
 
@@ -43,6 +53,11 @@ module Aggregates
             end
           end
         end
+      end
+      Game::LAST_STATS_PROCESSED_AT[:val] = Time.now
+
+      side_effects.each do |side_effect_event|
+        @events << side_effect_event
       end
 
       inventory = Aggregates::Inventory.new(@events).call

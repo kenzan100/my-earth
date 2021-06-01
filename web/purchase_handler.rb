@@ -16,7 +16,11 @@ class PurchaseHandler
       item.search(:purchase) || []
     )
 
-    result = Aggregates::Stats.new(Game::STATS, @events + [event]).call
+    result = Aggregates::Stats.new(
+      Game::STATS,
+      @events + [event],
+      Game::SPEED_CHANGE_EVENTS
+    ).call
 
     if result.violations.empty?
       @events << event
