@@ -70,7 +70,8 @@ module MyEarth
           }
 
           unless action
-            puts @available_jobs.map { |_, v| v[:string] }
+            res = Faraday.get(URL_HOST + "list")
+            puts res.body
             return
           end
 

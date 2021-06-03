@@ -10,18 +10,15 @@ loader.setup
 
 module World
   MONEY_SPACE = Constructs::Space.new(:money)
-  PURCHASE_VEC = Constructs::Vector.new(MONEY_SPACE, -10)
-
   ENERGY_SPACE = Constructs::Space.new(:energy)
-  EAT_VEC = Constructs::Vector.new(ENERGY_SPACE, 10)
-
   COOKIE_SPACE = Constructs::Space.new(:cookie)
+  JOB_SPACE = Constructs::Space.new(:software_engineer)
+  CS_SKILL_SPACE = Constructs::Space.new(:cs_skill)
+
+  PURCHASE_VEC = Constructs::Vector.new(MONEY_SPACE, -10)
+  EAT_VEC = Constructs::Vector.new(ENERGY_SPACE, 10)
   CONSUME_VEC = Constructs::Vector.new(COOKIE_SPACE, -1)
   PURCHASE_COOKIE_VEC = Constructs::Vector.new(COOKIE_SPACE, 1)
-
-  JOB_SPACE = Constructs::Space.new(:software_engineer)
-
-  CS_SKILL_SPACE = Constructs::Space.new(:cs_skill)
 
   JOB_SPACE.add_violation(
     ->(val) { val != Float::INFINITY },
@@ -49,7 +46,7 @@ module World
     30,
     { CS_SKILL_SPACE => 10 },
     { CS_SKILL_SPACE => 3 },
-    { ENERGY_SPACE => -10 }
+    { ENERGY_SPACE => -20 }
   )
   SOFTWARE_ENGINEER.add_possible_action(
     :hired,
@@ -97,6 +94,11 @@ app = Rack::Builder.new do
   map "/schedule" do
     loader.reload
     run ScheduleHandler.new(Game::EVENTS)
+  end
+
+  map "/list" do
+    loader.reload
+    run ListHandler.new(Game::EVENTS)
   end
 
   map "/apply" do

@@ -22,6 +22,12 @@ module Static
       }
     end
 
+    def to_h
+      {
+        actions: @action_dict
+      }
+    end
+
     def item_type
       :permanent
     end

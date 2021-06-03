@@ -1,10 +1,31 @@
 <html>
     <head></head>
     <body>
+        <p>Current schedule</p>
+        <ul id="scheduleWindow">
+            <span></span>
+        </ul>
+
+        <p>Activity log</p>
         <ul id="activityLogWindow">
         </ul>
-        <div id="statsWindow">
+
+        <p>Stats</p>
+        <ul id="statsWindow">
+            <span></span>
+        </ul>
+
+        <div>
+            <p>Job List</p>
+            <ul id="jobList">
+            </ul>
+            <p>Item List</p>
+            <ul id="itemList"></ul>
         </div>
-        <script src="./main.js"></script>
+
+        <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+        <script src="./pollGameState.js"></script>
+        <script src="./staticComponents.js"></script>
     </body>
 </html>

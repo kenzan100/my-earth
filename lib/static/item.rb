@@ -8,6 +8,12 @@ module Static
       @action_dict = {}
     end
 
+    def to_h
+      {
+        actions: @action_dict
+      }
+    end
+
     def add_possible_action(action_name, vectors)
       @action_dict[action_name] = vectors
     end

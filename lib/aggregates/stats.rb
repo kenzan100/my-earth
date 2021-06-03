@@ -8,7 +8,7 @@ module Aggregates
       @speed_change_events = speed_change_events
     end
 
-    Result = Struct.new(:attributes, :violations, :produced_events, :tick_events, :logs) do
+    Result = Struct.new(:attributes, :violations, :produced_events, :tick_events, :logs, :current_schedule) do
       def to_h
         {
           stats: attributes.transform_values { |v| v.to_s },
@@ -56,6 +56,7 @@ module Aggregates
         }
       end
 
+      result.current_schedule = Aggregates::Schedule.new(@events).call
       result.logs = logs
       result
     end

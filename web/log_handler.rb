@@ -24,7 +24,8 @@ class LogHandler
       [
         {
           events: res.logs,
-          stats: res.attributes.transform_values(&:to_s)
+          stats: res.attributes.transform_values(&:to_s),
+          schedule: res.current_schedule.to_a
         }.to_json
       ]
     ]
