@@ -11,5 +11,6 @@ gem 'faraday'
 # Server
 gem 'rack'
 gem 'webrick'
+gem 'rack-cors'
 
 gem 'byebug'

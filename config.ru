@@ -1,4 +1,5 @@
 require 'json'
+require 'rack/cors'
 
 require 'zeitwerk'
 loader = Zeitwerk::Loader.new
@@ -24,7 +25,7 @@ module World
 
   JOB_SPACE.add_violation(
     ->(val) { val != Float::INFINITY },
-    :you_are_not_hired_as_software_engineer_yet
+    :i_am_not_hired_as_software_engineer_yet
   )
   COOKIE_SPACE.add_violation(
     ->(val) { val < 0 },
@@ -75,6 +76,14 @@ end
 module Constants
   JSON_TYPE = { 'Content-Type' => 'application/json' }
   TEXT_TYPE = { 'Content-Type' => 'text/plan' }
+end
+
+# TODO Development only setup
+use Rack::Cors do
+  allow do
+    origins '*'
+    resource '*', headers: :any, methods: [:get, :post, :patch, :put]
+  end
 end
 
 app = Rack::Builder.new do

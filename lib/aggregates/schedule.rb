@@ -21,7 +21,7 @@ module Aggregates
     # so that validations/side effects can be expressed uniformly
     def call
       schedules = reject_overlaps(relevant_events)
-      Result.new(schedules)
+      Result.new(schedules.sort_by { |s| s.scheduled_duration.first })
     end
 
     def at(game_time)
