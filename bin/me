@@ -141,12 +141,22 @@ module MyEarth
         end
       end
 
+      class Logs < Dry::CLI::Command
+        argument :since
+
+        def call(since: nil, **)
+          res = Faraday.get(URL_HOST + "logs?since=#{since}")
+          puts res.body
+        end
+      end
+
       register 'init', Init
       register 'stats', Status
       register 'purchase', Purchase
       register 'schedule', Schedule
       register 'goods', Goods
       register 'jobs', Jobs
+      register 'logs', Logs
     end
   end
 end

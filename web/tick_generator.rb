@@ -43,7 +43,10 @@ class TickGenerator
         :tick,
         :game_time,
         [],
-        { when: registered_at }
+        {
+          when: registered_at,
+          game_time: starting.registered_at + (hour_tick * 3600)
+        }
       )
     end
   end

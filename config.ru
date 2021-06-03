@@ -104,6 +104,11 @@ app = Rack::Builder.new do
     run ApplyHandler.new(Game::EVENTS)
   end
 
+  map "/logs" do
+    loader.reload
+    run LogHandler.new(Game::EVENTS)
+  end
+
   map "/stats" do
     run ->(env) do
       [

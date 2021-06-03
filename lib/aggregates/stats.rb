@@ -8,7 +8,7 @@ module Aggregates
       @speed_change_events = speed_change_events
     end
 
-    Result = Struct.new(:attributes, :violations) do
+    Result = Struct.new(:attributes, :violations, :produced_events, :tick_events, :logs) do
       def to_h
         {
           stats: attributes.transform_values { |v| v.to_s },
@@ -28,19 +28,36 @@ module Aggregates
 
       triggered = []
 
-      pp (@events + produced_events + tick_events).sort_by(&:registered_at).map { |e| [ e.action, e.target.name, e.registered_at.to_s ] }
-
       (@events + produced_events).sort_by(&:registered_at).each do |event|
         process_event(event, result_attrs, triggered)
       end
 
       pp "#{tick_events.length} hours passed.."
-      pp triggered + progress_result.violations
 
       Result.new(
         result_attrs,
-        triggered + progress_result.violations
+        triggered + progress_result.violations,
+        produced_events,
+        tick_events
       )
+    end
+
+    def all_events(since: Game::START_TIME - 1)
+      result = call
+
+      base = (@events + result.produced_events + result.tick_events).sort_by(&:registered_at)
+      logs = base.select { |ev| ev.registered_at.to_i > since.to_i }.map do |e|
+        {
+          action: e.action,
+          target: e.target.name,
+          violations: e.violations,
+          game_time: e.game_time&.iso8601,
+          registered_at: e.registered_at.iso8601
+        }
+      end
+
+      result.logs = logs
+      result
     end
 
     private
@@ -58,6 +75,7 @@ module Aggregates
 
       if violations.any?
         triggered.concat violations
+        event.violations = violations
         return
       end
 

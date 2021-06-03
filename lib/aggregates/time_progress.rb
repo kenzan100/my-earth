@@ -16,7 +16,7 @@ module Aggregates
         next if i == ticks.length - 1
 
         schedules_at_t = Aggregates::Schedule.new(schedules).at(t)
-        schedules_at_t.each do |schedule_event|
+        schedules_at_t.each.with_index do |schedule_event, i|
           item_or_job = schedule_event.target
           vectors = item_or_job.search(schedule_event.scheduled_action)
 
@@ -30,7 +30,7 @@ module Aggregates
             schedule_event.scheduled_action,
             item_or_job,
             vectors,
-            { when: t.registered_at + 1 }
+            { when: t.registered_at + i + 1 }
           )
         end
       end
