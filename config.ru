@@ -116,7 +116,7 @@ module Game
   SPEED_CHANGE_EVENTS = []
   STATS = { World::MONEY_SPACE.name => 25 }
   START_TIME = Time.now
-  INITIAL_SPEED = 1000
+  INITIAL_SPEED = 20000 # how fast you want a day to pass (multiplier)
   LAST_STATS_PROCESSED_AT = { val: START_TIME }
 end
 

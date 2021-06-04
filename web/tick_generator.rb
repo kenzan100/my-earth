@@ -31,13 +31,15 @@ class TickGenerator
 
   end
 
+  DAY_IN_SECONDS = 86400
+
   def calc_portion(time_pair, speed)
     starting, ending = time_pair
     elapsed = ending.registered_at - starting.registered_at
-    tick_rate = 3600.to_f / speed
+    tick_rate = DAY_IN_SECONDS.to_f / speed
 
-    (elapsed / tick_rate).floor.times.map do |hour_tick|
-      registered_at = starting.registered_at + (hour_tick * tick_rate)
+    (elapsed / tick_rate).floor.times.map do |day_tick|
+      registered_at = starting.registered_at + (day_tick * tick_rate)
 
       Events::GameTime.new(
         :tick,
@@ -45,7 +47,7 @@ class TickGenerator
         [],
         {
           when: registered_at,
-          game_time: starting.registered_at + (hour_tick * 3600)
+          game_time: starting.registered_at + (day_tick * DAY_IN_SECONDS)
         }
       )
     end

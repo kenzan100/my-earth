@@ -32,7 +32,7 @@ module Aggregates
         process_event(event, result_attrs, triggered)
       end
 
-      pp "#{tick_events.length} hours passed.."
+      pp "#{tick_events.length} days passed.."
 
       Result.new(
         result_attrs,
