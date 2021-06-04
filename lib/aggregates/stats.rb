@@ -72,7 +72,7 @@ module Aggregates
 
         vector.space.conditions.map do |condition|
           if condition.rule.call(current_val + vector.magnitude)
-            condition.event_name
+            condition.human_readable
           end
         end
       end.compact
@@ -81,7 +81,7 @@ module Aggregates
         event_force = event.forces.find { |v| v.space.name == rule.space.name }
         current_val = result_attrs[rule.space.name] || 0
         if rule.rule.call(current_val + (event_force&.magnitude || 0))
-          rule.event_name
+          rule.rule_description
         end
       end.compact
 

@@ -20,7 +20,7 @@ class TickGenerator
 
   private
 
-  def build_speed_change_event(time, speed_value: 1000)
+  def build_speed_change_event(time, speed_value: 10000)
     # TODO: probably wiser to utilize forces to send speed values and speed as its own space + vector
     Events::GameTime.new(
       :game_speed_change,

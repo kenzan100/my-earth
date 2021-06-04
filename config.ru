@@ -24,19 +24,22 @@ module World
 
   COOKIE_SPACE.add_violation(
     ->(val) { val < 0 },
-    :cookie_cannot_be_below_zero
+    :cookie_cannot_be_below_zero,
+    "I can't consume what I don't have."
   )
   ENERGY_SPACE.add_violation(
     ->(val) { val < 0 },
-    :i_am_too_tired
+    :i_am_too_tired,
+    "I need more energy to do this."
   )
   MONEY_SPACE.add_violation(
     ->(val) { val < 0 },
-    :money_cannot_go_below_zero
+    :money_cannot_go_below_zero,
+    "I don't have enough money."
   )
 
   MONEY_SPACE.add_endstate(
-    ->(val) { val > 10 },
+    ->(val) { val > 10_000 },
     :ten_k_money_achieved
   )
 
@@ -84,7 +87,7 @@ module World
     :work,
     [
       Constructs::Vector.new(ENERGY_SPACE, -10),
-      Constructs::Vector.new(COMMUNICATION_SPACE, 2),
+      Constructs::Vector.new(COMMUNICATION_SPACE, 1),
       Constructs::Vector.new(MONEY_SPACE, 12)
     ],
     [
@@ -155,6 +158,26 @@ app = Rack::Builder.new do
   map "/logs" do
     loader.reload
     run LogHandler.new(Game::EVENTS)
+  end
+
+  map "/change_speed" do
+    loader.reload
+    run ->(env) do
+      event = Events::GameTime.new(
+        :game_speed_change,
+        :system,
+        [],
+        { when: Time.now, speed_val: 1000 }
+      )
+
+      Game::SPEED_CHANGE_EVENTS << event
+
+      [
+        200,
+        Constants::TEXT_TYPE,
+        [ "game speed changed successfully."]
+      ]
+    end
   end
 
   map "/stats" do

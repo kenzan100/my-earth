@@ -1,6 +1,9 @@
 <html>
-    <head></head>
-    <body>
+    <head>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100;400;700&display=swap" rel="stylesheet">
+    </head>
+    <body style="font-family: 'Roboto Mono', monospace;">
         <p>Goal</p>
         <ul id="goalWindow">
             <li>Reach 10,000 money.</li>
@@ -13,7 +16,7 @@
         </ul>
 
         <p>Current schedule</p>
-        <ul id="scheduleWindow">
+        <ul id="scheduleWindow" style="white-space: pre;">
             <li>No schedule registered.</li>
         </ul>
 
@@ -29,9 +32,6 @@
             <ul id="itemList"></ul>
         </div>
 
-        <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
-        <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
-        <script src="./pollGameState.js"></script>
-        <script src="./staticComponents.js"></script>
+        <script src="./src/out.js"></script>
     </body>
 </html>

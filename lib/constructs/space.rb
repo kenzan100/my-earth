@@ -4,7 +4,7 @@ module Constructs
     attr_reader :conditions
     attr_reader :end_states
 
-    Condition = Struct.new(:rule, :event_name)
+    Condition = Struct.new(:rule, :event_name, :human_readable)
 
     def initialize(name)
       @name = name
@@ -12,8 +12,8 @@ module Constructs
       @end_states = []
     end
 
-    def add_violation(rule, event_name)
-      @conditions << Condition.new(rule, event_name)
+    def add_violation(rule, event_name, human_readable)
+      @conditions << Condition.new(rule, event_name, human_readable)
     end
 
     def add_endstate(rule, event_name)

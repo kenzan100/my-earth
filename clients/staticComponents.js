@@ -1,7 +1,7 @@
 const JobListWindow = document.getElementById('jobList');
 const ItemListWindow = document.getElementById('itemList');
 
-function renderItems(list) {
+export function renderItems(list) {
     renderCategory(list.items, ItemListWindow);
     renderCategory(list.jobs, JobListWindow);
 }
@@ -34,7 +34,3 @@ function renderCategory(items, parentNode) {
         });
     });
 }
-
-fetch(URL+`/list`)
-    .then(res => res.json())
-    .then(data => renderItems(data));

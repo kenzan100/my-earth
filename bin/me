@@ -151,6 +151,15 @@ module MyEarth
         end
       end
 
+      class ChangeSpeed < Dry::CLI::Command
+        argument :val
+
+        def call(val: nil, **)
+          res = Faraday.get(URL_HOST + "change_speed")
+          puts res.body
+        end
+      end
+
       register 'init', Init
       register 'stats', Status
       register 'purchase', Purchase
@@ -158,6 +167,7 @@ module MyEarth
       register 'goods', Goods
       register 'jobs', Jobs
       register 'logs', Logs
+      register 'change_speed', ChangeSpeed
     end
   end
 end
