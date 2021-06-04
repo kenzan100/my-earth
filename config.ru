@@ -40,9 +40,9 @@ module World
     "I don't have enough money."
   )
 
-  MONEY_SPACE.add_endstate(
-    ->(val) { val > 10_000 },
-    :ten_k_money_achieved
+  MONEY_SPACE.add_end_state(
+    ->(val) { val > 1000 },
+    :money_achieved
   )
 
   COOKIE = Static::Allocatable.new(:cookie, :item)
@@ -118,7 +118,7 @@ module Game
   SPEED_CHANGE_EVENTS = []
   STATS = { World::MONEY_SPACE.name => 25 }
   START_TIME = Time.now
-  INITIAL_SPEED = 20000 # how fast you want a day to pass (multiplier)
+  INITIAL_SPEED = 20_000 # how fast you want a day to pass (multiplier)
   LAST_STATS_PROCESSED_AT = { val: START_TIME }
 end
 
@@ -160,22 +160,7 @@ app = Rack::Builder.new do
 
   map "/change_speed" do
     loader.reload
-    run ->(env) do
-      event = Events::GameTime.new(
-        :game_speed_change,
-        :system,
-        [],
-        { when: Time.now, speed_val: 1000 }
-      )
-
-      Game::SPEED_CHANGE_EVENTS << event
-
-      [
-        200,
-        Constants::TEXT_TYPE,
-        [ "game speed changed successfully."]
-      ]
-    end
+    run ChangeSpeedHandler.new(Game::EVENTS)
   end
 
   map "/stats" do

@@ -16,7 +16,7 @@ module Constructs
       @conditions << Condition.new(rule, event_name, human_readable)
     end
 
-    def add_endstate(rule, event_name)
+    def add_end_state(rule, event_name)
       @end_states << Condition.new(rule, event_name)
     end
   end

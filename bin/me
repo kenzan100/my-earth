@@ -94,7 +94,7 @@ module MyEarth
         argument :val
 
         def call(val: nil, **)
-          res = Faraday.get(URL_HOST + "change_speed")
+          res = Faraday.get(URL_HOST + "change_speed?speed=#{val}")
           puts res.body
         end
       end

@@ -46,7 +46,8 @@ module Aggregates
           [],
           {
             when: registered_at,
-            game_time: starting.registered_at + (day_tick * World::DAY_IN_SECONDS)
+            game_time: starting.registered_at + (day_tick * World::DAY_IN_SECONDS),
+            speed_val: speed
           }
         )
       end

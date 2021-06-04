@@ -12,8 +12,7 @@ module Events
       @violations = []
       @registered_at = options[:when] || Time.now
 
-      # TODO: 1 is a lame default; any way to send the current speed from system?
-      @current_speed = options[:speed_val] || 1
+      @current_speed = options[:speed_val] || raise("speed_val must be provided")
 
       @game_time = options[:game_time]
     end
