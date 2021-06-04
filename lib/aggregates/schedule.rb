@@ -15,7 +15,9 @@ module Aggregates
           duration = schedule.scheduled_duration
 
           details_msg = if details
-                          details.vectors.map(&:to_s).join(', ')
+                          details.vectors.map do |vec|
+                            vec.to_s(duration: schedule.scheduled_duration.size)
+                          end.join(', ')
                         else
                           "Unknown action"
                         end

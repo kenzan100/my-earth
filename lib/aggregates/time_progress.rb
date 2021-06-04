@@ -30,7 +30,10 @@ module Aggregates
             schedule_event.scheduled_action,
             item_or_job,
             details.vectors,
-            { when: t.registered_at + i + 1 },
+            {
+              duration: schedule_event.scheduled_duration.size, # hours
+              when: t.registered_at + i + 1
+            },
             rules: details.rules || []
           )
         end

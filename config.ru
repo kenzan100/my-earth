@@ -30,7 +30,7 @@ module World
   ENERGY_SPACE.add_violation(
     ->(val) { val < 0 },
     :i_am_too_tired,
-    "I need more energy to do this."
+    "I need more energy."
   )
   MONEY_SPACE.add_violation(
     ->(val) { val < 0 },

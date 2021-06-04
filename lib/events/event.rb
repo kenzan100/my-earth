@@ -1,6 +1,6 @@
 module Events
   class Event
-    attr_reader :action, :target, :forces, :registered_at, :game_time, :rules
+    attr_reader :action, :target, :forces, :registered_at, :game_time, :rules, :duration
 
     attr_accessor :violations, :end_state
 
@@ -13,6 +13,7 @@ module Events
       @violations = []
 
       @registered_at = options[:when] || Time.now
+      @duration = options[:duration] || 1 # hour
     end
 
     def scheduled_action

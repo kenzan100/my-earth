@@ -71,16 +71,18 @@ module Aggregates
         current_val = result_attrs[vector.space.name] || 0
 
         vector.space.conditions.map do |condition|
-          if condition.rule.call(current_val + vector.magnitude)
+          movement = vector.magnitude * event.duration
+          if condition.rule.call(current_val + movement)
             condition.human_readable
           end
         end
       end.compact
 
       event_violations = event.rules.map do |rule|
-        event_force = event.forces.find { |v| v.space.name == rule.space.name }
+        vector = event.forces.find { |v| v.space.name == rule.space.name }
         current_val = result_attrs[rule.space.name] || 0
-        if rule.rule.call(current_val + (event_force&.magnitude || 0))
+        movement = (vector&.magnitude || 0) * event.duration
+        if rule.rule.call(current_val + movement)
           rule.rule_description
         end
       end.compact
@@ -98,7 +100,8 @@ module Aggregates
           result_attrs[event_force.space.name] = 0
         end
 
-        result_attrs[event_force.space.name] += event_force.magnitude
+        movement = event_force.magnitude * event.duration
+        result_attrs[event_force.space.name] += movement
 
         event_force.space.end_states.each do |end_state_condition|
           if end_state_condition.rule.call(result_attrs[event_force.space.name])
