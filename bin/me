@@ -10,22 +10,25 @@ module MyEarth
     module Commands
       extend Dry::CLI::Registry
 
-      class Purchase < Dry::CLI::Command
-        desc "Purchase goods"
+      class Action < Dry::CLI::Command
+        desc "List of one-off actions"
 
-        argument :target, required: true, desc: "The name of goods for purchase. list to see the available goods."
+        argument :target, required: true, desc: "The name of goods for action. list to see the available goods."
+        argument :action, desc: "The name of action you wanna perform on."
 
-        def call(target:, **)
-          goods = [
-            FIXTURES[:cs_book]
-          ]
+        def call(target:, action: nil, **)
           if target == 'list'
-            puts goods
-          else
-            puts "trying to purchase #{target}.."
-
-            res = Faraday.get(URL_HOST + "purchase?target=#{target}")
+            puts "List of available actions.."
+            puts
+            res = Faraday.get(URL_HOST + "list?text=true")
             puts res.body
+          elsif target && action
+            puts "trying to #{action} #{target}.."
+
+            res = Faraday.get(URL_HOST + "action?target=#{target}&action=#{action}")
+            puts res.body
+          else
+            puts "Usage: \"me action TARGET ACTION\""
           end
         end
       end
@@ -97,7 +100,7 @@ module MyEarth
       end
 
       register 'stats', Status
-      register 'purchase', Purchase
+      register 'action', Action
       register 'schedule', Schedule
       register 'logs', Logs
       register 'change_speed', ChangeSpeed

@@ -72,7 +72,7 @@ export const Renderer = {
     buildLogLine(event) {
         let result = ''
         if (event.violations.length > 0) {
-            result = event.violations.join()
+            result = `Failed. ${event.violations.join(' ')}`;
         }
         let base = `${Utils.capitalize(event.action)} ${event.target}. ${result}`;
         if (event.game_time) {

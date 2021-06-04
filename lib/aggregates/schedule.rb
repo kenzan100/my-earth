@@ -11,12 +11,18 @@ module Aggregates
 
       def to_a
         current_schedule.map do |schedule|
-          details = schedule.target.search(schedule.scheduled_action) || []
+          details = schedule.target.search(schedule.scheduled_action)
           duration = schedule.scheduled_duration
+
+          details_msg = if details
+                          details.vectors.map(&:to_s).join(', ')
+                        else
+                          "Unknown action"
+                        end
 
           "#{duration.first.to_s.rjust(2)} - #{duration.last.to_s.rjust(2)} " +
             "| #{schedule.scheduled_action} #{schedule.target.name} " +
-            "(#{details.vectors.map(&:to_s).join(', ')})"
+            "(#{details_msg})"
         end
       end
     end
@@ -32,7 +38,7 @@ module Aggregates
       events = relevant_events.select do |ev|
         ev.registered_at <= game_time.registered_at
       end
-      reject_overlaps(events)
+      reject_overlaps(events).sort_by { |s| s.scheduled_duration.first }
     end
 
     private

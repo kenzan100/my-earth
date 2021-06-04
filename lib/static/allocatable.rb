@@ -1,6 +1,6 @@
 module Static
   class Allocatable
-    attr_reader :name, :item_type
+    attr_reader :name, :item_type, :action_dict
 
     def initialize(canonical_name, item_type)
       @name = canonical_name
@@ -8,9 +8,15 @@ module Static
       @action_dict = {}
     end
 
+    def to_a
+      action_dict.map do |action, details|
+        "#{name} - #{action} (#{details.vectors.map(&:to_s).join(', ')})"
+      end
+    end
+
     def to_h
       {
-        actions: @action_dict.transform_values do |details|
+        actions: action_dict.transform_values do |details|
           {
             vectors: details.vectors,
             rules: details.rules.map(&:to_h)

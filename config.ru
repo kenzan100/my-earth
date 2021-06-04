@@ -82,7 +82,7 @@ module World
       )
     ]
   )
-  MCDONALD_PART_TIME = Static::Allocatable.new(:mc_part_time, :job)
+  MCDONALD_PART_TIME = Static::Allocatable.new(:mcdonald_part_time, :job)
   MCDONALD_PART_TIME.add_possible_action(
     :work,
     [
@@ -136,9 +136,9 @@ end
 app = Rack::Builder.new do
   use Rack::ShowExceptions
 
-  map "/purchase" do
+  map "/action" do
     loader.reload
-    run PurchaseHandler.new(Game::EVENTS)
+    run OneOffActionHandler.new(Game::EVENTS)
   end
 
   map "/schedule" do

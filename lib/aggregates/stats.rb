@@ -26,17 +26,17 @@ module Aggregates
       result_attrs = {}
       result_attrs.merge!(@base)
 
-      triggered = []
-
-      (@events + produced_events).sort_by(&:registered_at).each do |event|
-        process_event(event, result_attrs, triggered)
+      events_to_process = (@events + produced_events).sort_by(&:registered_at)
+      events_to_process.each do |event|
+        process_event(event, result_attrs)
       end
 
       pp "#{tick_events.length} days passed.."
+      latest_violation = events_to_process.last&.violations || []
 
       Result.new(
         result_attrs,
-        triggered + progress_result.violations,
+        latest_violation + progress_result.violations,
         produced_events,
         tick_events
       )
@@ -66,7 +66,7 @@ module Aggregates
 
     private
 
-    def process_event(event, result_attrs, triggered)
+    def process_event(event, result_attrs)
       violations = event.forces.flat_map do |vector|
         current_val = result_attrs[vector.space.name] || 0
 
@@ -88,7 +88,6 @@ module Aggregates
       violations.concat event_violations
 
       if violations.any?
-        triggered.concat violations
         event.violations = violations
         return
       end

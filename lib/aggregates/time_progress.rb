@@ -20,7 +20,7 @@ module Aggregates
           item_or_job = schedule_event.target
           details = item_or_job.search(schedule_event.scheduled_action)
 
-          unless details.vectors
+          unless details&.vectors
             msg = "#{item_or_job.name} does not know how to #{schedule_event.scheduled_action}"
             violations << msg
             next
