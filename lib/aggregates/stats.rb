@@ -18,7 +18,7 @@ module Aggregates
     end
 
     def call
-      tick_events = TickGenerator.new(events: @speed_change_events).call
+      tick_events = Aggregates::TickGenerator.new(events: @speed_change_events).call
 
       progress_result = Aggregates::TimeProgress.new(tick_events + @events).call
       produced_events = progress_result.events

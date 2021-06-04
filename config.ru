@@ -9,6 +9,8 @@ loader.enable_reloading
 loader.setup
 
 module World
+  DAY_IN_SECONDS = 86400
+
   MONEY_SPACE = Constructs::Space.new(:money)
   ENERGY_SPACE = Constructs::Space.new(:energy)
   COOKIE_SPACE = Constructs::Space.new(:cookie)
