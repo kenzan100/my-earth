@@ -11,12 +11,12 @@ module Aggregates
 
       def to_a
         current_schedule.map do |schedule|
-          vectors = schedule.target.search(schedule.scheduled_action) || []
+          details = schedule.target.search(schedule.scheduled_action) || []
           duration = schedule.scheduled_duration
 
           "#{duration.first.to_s.rjust(2)} - #{duration.last.to_s.rjust(2)} " +
             "| #{schedule.scheduled_action} #{schedule.target.name} " +
-            "(#{vectors.map(&:to_s).join(', ')})"
+            "(#{details.vectors.map(&:to_s).join(', ')})"
         end
       end
     end

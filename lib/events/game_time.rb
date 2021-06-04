@@ -2,7 +2,7 @@ module Events
   class GameTime
     attr_reader :action, :target, :forces, :registered_at, :current_speed, :game_time
 
-    attr_accessor :violations
+    attr_accessor :violations, :end_state
 
     # by default hourly
     def initialize(action, target, forces = [], options = {})

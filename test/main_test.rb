@@ -78,7 +78,7 @@ describe 'Game CLI mode - end to end' do
       "cs_book * 1 | permanent\ncookie * 0 | consumable"
     )
 
-    @software_engineer = Static::Job.new(
+    @software_engineer = Static::Allocatable.new(
       :software_engineer,
       30,
       { cs_skill: 10 },

@@ -18,9 +18,9 @@ module Aggregates
         schedules_at_t = Aggregates::Schedule.new(schedules).at(t)
         schedules_at_t.each.with_index do |schedule_event, i|
           item_or_job = schedule_event.target
-          vectors = item_or_job.search(schedule_event.scheduled_action)
+          details = item_or_job.search(schedule_event.scheduled_action)
 
-          unless vectors
+          unless details.vectors
             msg = "#{item_or_job.name} does not know how to #{schedule_event.scheduled_action}"
             violations << msg
             next
@@ -29,8 +29,9 @@ module Aggregates
           produced_events << Events::Event.new(
             schedule_event.scheduled_action,
             item_or_job,
-            vectors,
-            { when: t.registered_at + i + 1 }
+            details.vectors,
+            { when: t.registered_at + i + 1 },
+            rules: details.rules || []
           )
         end
       end

@@ -52,7 +52,10 @@ module Aggregates
           target: e.target.name,
           violations: e.violations,
           game_time: e.game_time&.iso8601,
-          registered_at: e.registered_at.iso8601
+          registered_at: e.registered_at.iso8601,
+          end_state: e.end_state,
+          game_start: Game::START_TIME.iso8601,
+          elapsed: (e.registered_at - Game::START_TIME).floor
         }
       end
 
@@ -74,6 +77,16 @@ module Aggregates
         end
       end.compact
 
+      event_violations = event.rules.map do |rule|
+        event_force = event.forces.find { |v| v.space.name == rule.space.name }
+        current_val = result_attrs[rule.space.name] || 0
+        if rule.rule.call(current_val + (event_force&.magnitude || 0))
+          rule.event_name
+        end
+      end.compact
+
+      violations.concat event_violations
+
       if violations.any?
         triggered.concat violations
         event.violations = violations
@@ -87,6 +100,13 @@ module Aggregates
         end
 
         result_attrs[event_force.space.name] += event_force.magnitude
+
+        event_force.space.end_states.each do |end_state_condition|
+          if end_state_condition.rule.call(result_attrs[event_force.space.name])
+            # overrides to the last one
+            event.end_state = end_state_condition.event_name
+          end
+        end
       end
     end
   end

@@ -15,17 +15,25 @@ function renderCategory(items, parentNode) {
         targetNode.appendChild(innerList);
         parentNode.appendChild(targetNode);
 
-        Object.entries(obj.actions).forEach(([actionName, arr]) => {
-            const base = `${actionName} (${arr.join(', ')})`
+        Object.entries(obj.actions).forEach(([actionName, details]) => {
+            console.info(details.rules)
+            const base = `${actionName} (${details.vectors.join(', ')})`
             const text = document.createTextNode(base);
             const innerLi = document.createElement('li')
             innerLi.appendChild(text)
             innerList.appendChild(innerLi)
+
+            const ruleLi = document.createElement('ul');
+            details.rules.forEach(rule => {
+                const text = document.createTextNode(`${rule.rule}`);
+                const eachRule = document.createElement('li');
+                eachRule.appendChild(text)
+                ruleLi.append(eachRule)
+            });
+            innerLi.appendChild(ruleLi);
         });
     });
 }
-
-
 
 fetch(URL+`/list`)
     .then(res => res.json())
