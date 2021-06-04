@@ -79,7 +79,7 @@ export const Renderer = {
             const dateTime = Luxon.DateTime.fromISO(event.game_time);
             return dateTime.toFormat('yyyy LLL dd');
         } else {
-            return base;
+            return ` ${base}`;
         }
     },
 

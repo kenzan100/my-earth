@@ -3,17 +3,6 @@
 require 'dry/cli'
 require 'faraday'
 
-FIXTURES = {
-  cs_book: {
-    name: :cs_book,
-    price: 10,
-    hourly_effects: {
-      cs_skill: 10,
-      energy: -5,
-    }
-  }
-}
-
 URL_HOST = 'http://localhost:9292/'
 
 module MyEarth
@@ -37,50 +26,6 @@ module MyEarth
 
             res = Faraday.get(URL_HOST + "purchase?target=#{target}")
             puts res.body
-          end
-        end
-      end
-
-      class Goods < Dry::CLI::Command
-        desc "List goods with me"
-
-        def call(**)
-          @my_goods = [
-            "CS Book *  1 | permanent",
-            "Cookie  * 10 | consumable"
-          ]
-          puts @my_goods
-        end
-      end
-
-      class Jobs < Dry::CLI::Command
-        argument :action
-        argument :job_id
-
-        def call(action: nil, job_id: nil, **)
-          @available_jobs = {
-            1 => {
-              name: :software_engineer,
-              string: "1 | Software engineer    | $30 / hour"
-            },
-            2 => {
-              name: :mcdonald_part_time,
-              string: "2 | McDonald's part-time | $10 / hour"
-            }
-          }
-
-          unless action
-            res = Faraday.get(URL_HOST + "list")
-            puts res.body
-            return
-          end
-
-          if action && job_id && found = @available_jobs[job_id.to_i]
-            puts "Applying for #{found[:string]}.."
-            res = Faraday.get(URL_HOST + "apply?target=#{found[:name]}")
-            puts res.body
-          else
-            puts "Usage: \"me jobs ACTION JOB_ID\""
           end
         end
       end
@@ -122,15 +67,6 @@ module MyEarth
         end
       end
 
-      class Init < Dry::CLI::Command
-        desc "Start a game"
-
-        def call(input: nil, **)
-          @stats = { energy: 100, money: 100 }
-          puts @stats
-        end
-      end
-
       class Status < Dry::CLI::Command
         desc "See current stats"
 
@@ -160,12 +96,9 @@ module MyEarth
         end
       end
 
-      register 'init', Init
       register 'stats', Status
       register 'purchase', Purchase
       register 'schedule', Schedule
-      register 'goods', Goods
-      register 'jobs', Jobs
       register 'logs', Logs
       register 'change_speed', ChangeSpeed
     end

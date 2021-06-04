@@ -116,6 +116,7 @@ module Game
   SPEED_CHANGE_EVENTS = []
   STATS = { World::MONEY_SPACE.name => 25 }
   START_TIME = Time.now
+  INITIAL_SPEED = 1000
   LAST_STATS_PROCESSED_AT = { val: START_TIME }
 end
 
@@ -148,11 +149,6 @@ app = Rack::Builder.new do
   map "/list" do
     loader.reload
     run ListHandler.new(Game::EVENTS)
-  end
-
-  map "/apply" do
-    loader.reload
-    run ApplyHandler.new(Game::EVENTS)
   end
 
   map "/logs" do
