@@ -1,11 +1,11 @@
 require 'json'
 require 'rack/cors'
+require 'byebug'
 
 require 'zeitwerk'
 loader = Zeitwerk::Loader.new
 loader.push_dir("#{__dir__}/lib")
 loader.push_dir("#{__dir__}/web")
-loader.enable_reloading
 loader.setup
 
 # TODO Development only setup
@@ -16,32 +16,53 @@ use Rack::Cors do
   end
 end
 
+GAMES = {
+  1 => Game.new
+}
+
+class GameChoice
+  def initialize(app)
+    @app = app
+  end
+
+  def call(env)
+    game = GAMES[env["HTTP_MY_JOB_GAME_ID"].to_i]
+
+    unless game
+      return [
+        404,
+        Constants::TEXT_TYPE,
+        [ "game not found" ]
+      ]
+    end
+
+    env['GAME'] = game
+    @app.call(env)
+  end
+end
+
 app = Rack::Builder.new do
   use Rack::ShowExceptions
+  use GameChoice
 
   map "/action" do
-    loader.reload
-    run OneOffActionHandler.new(Game::EVENTS)
+    run OneOffActionHandler.new([])
   end
 
   map "/schedule" do
-    loader.reload
-    run ScheduleHandler.new(Game::EVENTS)
+    run ScheduleHandler.new []
   end
 
   map "/list" do
-    loader.reload
-    run ListHandler.new(Game::EVENTS)
+    run ListHandler.new []
   end
 
   map "/logs" do
-    loader.reload
-    run LogHandler.new(Game::EVENTS)
+    run LogHandler
   end
 
   map "/change_speed" do
-    loader.reload
-    run ChangeSpeedHandler.new(Game::EVENTS)
+    run ChangeSpeedHandler.new []
   end
 
   map "/stats" do

@@ -1,14 +1,11 @@
 require 'time'
 
 class LogHandler
-  def initialize(events)
-    @events = events
-  end
-
-  def call(env)
+  def self.call(env)
+    game = env['GAME']
     req = Rack::Request.new(env)
 
-    stats = Aggregates::Stats.new({}, Game::EVENTS, Game::SPEED_CHANGE_EVENTS)
+    stats = Aggregates::Stats.new(game)
 
     since = req.params['since']
     res = begin

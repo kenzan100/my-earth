@@ -2,8 +2,13 @@ require_relative 'test_setup'
 
 describe Aggregates::TickGenerator do
   it 'generates ticks as many as time elapsed since beginning of the game' do
+    game = Game.new
     game_start = Time.now - 10000
-    instance = Aggregates::TickGenerator.new(start_time: game_start)
+    instance = Aggregates::TickGenerator.new(
+      start_time: game_start,
+      events: [],
+      initial_speed: game.initial_speed
+    )
     tick_events = instance.call(Time.now)
     tick_events.map(&:game_time).each.with_index do |tick_time, i|
       elapsed = game_start + (i * Game::DAY_IN_SECONDS)
@@ -23,7 +28,8 @@ describe Aggregates::TickGenerator do
     ]
     instance = Aggregates::TickGenerator.new(
       start_time: game_start,
-      events: game_speed_change_events
+      events: game_speed_change_events,
+      initial_speed: Game.new.initial_speed
     )
 
     tick_events = instance.call(Time.now)

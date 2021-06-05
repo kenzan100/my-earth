@@ -1,9 +1,20 @@
 class Game
-  EVENTS = []
-  SPEED_CHANGE_EVENTS = []
-  STATS = { }
-  START_TIME = Time.now
-  INITIAL_SPEED = 20_000 # how fast you want a day to pass (multiplier)
-  LAST_STATS_PROCESSED_AT = { val: START_TIME }
   DAY_IN_SECONDS = 86400
+
+  attr_reader :start_time, :initial_speed
+  attr_accessor :events, :speed_change_events, :stats
+
+  def initialize
+    @events = []
+    @speed_change_events = []
+    @stats = { money: 100 }
+
+    @start_time = Time.now
+    @initial_speed = 20_000 # how fast you want a day to pass (multiplier)
+  end
+
+  def add_events(events)
+    @events.concat events
+    self
+  end
 end

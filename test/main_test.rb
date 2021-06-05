@@ -36,6 +36,7 @@ describe 'Game CLI mode - end to end' do
   end
 
   it "simulates the single game play" do
+    game = Game.new
     money_space = Constructs::Space.new(:money)
 
     ev3 = Events::Event.new(:schedule, @cs_book, [], { as: :study, from: 9, till: 10})
@@ -54,7 +55,7 @@ describe 'Game CLI mode - end to end' do
     _(produced_events.group_by(&:action)[:study].first.target).must_equal @cs_book
     _(produced_events.group_by(&:action)[:eat].first.target).must_equal @cookie
 
-    result = Aggregates::Stats.new({}, produced_events, []).call
+    result = Aggregates::Stats.new(game.add_events(produced_events)).call
 
     _(result.to_h).must_equal(
       {
@@ -88,19 +89,18 @@ describe 'Game CLI mode - end to end' do
     _(produced_events.first.action).must_equal :work
     _(produced_events.first.target).must_equal @software_engineer
 
-    result = Aggregates::Stats.new({}, produced_events, []).call
+    result = Aggregates::Stats.new(game.add_events(produced_events)).call
 
     _(result.to_h).must_equal(
       {
-        stats: { money: "346" },
+        stats: { money: "346", energy: "28" },
         violations: []
       }
     )
   end
 
   it "terminates if terminating space attr goes zero" do
-    base = {  energy: 0 }
-    result = Aggregates::Stats.new(base, @events, []).call
+    result = Aggregates::Stats.new(Game.new.add_events(@events)).call
     _(result.violations).must_equal(
       ["Energy cannot go below 0"]
     )

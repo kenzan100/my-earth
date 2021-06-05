@@ -1,8 +1,9 @@
 module Aggregates
   class TickGenerator
-    def initialize(start_time: Game::START_TIME, events: [])
+    def initialize(start_time:, events:, initial_speed:)
       @start_time = start_time
       @speed_change_events = events
+      @initial_speed = initial_speed
     end
 
     def call(now = Time.now)
@@ -21,7 +22,7 @@ module Aggregates
 
     private
 
-    def build_speed_change_event(time, speed_value: Game::INITIAL_SPEED)
+    def build_speed_change_event(time, speed_value: @initial_speed)
       # TODO: probably wiser to utilize forces to send speed values and speed as its own space + vector
       Events::GameTime.new(
         :game_speed_change,

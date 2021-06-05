@@ -2,10 +2,12 @@ require 'byebug'
 
 module Aggregates
   class Stats
-    def initialize(base, events, speed_change_events)
-      @base = { money: 100 } # process all the events for now
-      @events = events
-      @speed_change_events = speed_change_events
+    def initialize(game)
+      @base = game.stats # process all the events for now
+      @events = game.events
+      @speed_change_events = game.speed_change_events
+      @start_time = game.start_time
+      @initial_speed = game.initial_speed
     end
 
     Result = Struct.new(:attributes, :violations, :produced_events, :tick_events, :logs, :current_schedule) do
@@ -18,7 +20,9 @@ module Aggregates
     end
 
     def call
-      tick_events = Aggregates::TickGenerator.new(events: @speed_change_events).call
+      tick_events = Aggregates::TickGenerator.new(
+        start_time: @start_time, events: @speed_change_events, initial_speed: @initial_speed
+      ).call
 
       progress_result = Aggregates::TimeProgress.new(tick_events + @events).call
       produced_events = progress_result.events
@@ -42,7 +46,7 @@ module Aggregates
       )
     end
 
-    def all_events(since: Game::START_TIME - 1)
+    def all_events(since: @start_time - 1)
       result = call
 
       base = (@events + result.produced_events + result.tick_events).sort_by(&:registered_at)
@@ -58,8 +62,8 @@ module Aggregates
           game_time: e.game_time&.iso8601,
           registered_at: e.registered_at.iso8601(6),
           end_state: e.end_state,
-          game_start: Game::START_TIME.iso8601,
-          elapsed: (e.registered_at - Game::START_TIME).floor,
+          game_start: @start_time.iso8601,
+          elapsed: (e.registered_at - @start_time).floor,
           since: since.iso8601(6)
         }
       end

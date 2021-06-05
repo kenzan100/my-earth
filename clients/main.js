@@ -4,9 +4,12 @@ import * as StaticComponent from './staticComponents';
 console.log("loaded");
 
 const URL = 'http://localhost:9292';
+let options = { method: 'GET', headers: { 'MY_JOB_GAME_ID': 1 } }
 
 function fetchLogs() {
-    fetch(URL+`/logs?since=${window.sinceTimestamp}`)
+    console.info(window.sinceTimestamp);
+    const logsRequest = new Request(URL+`/logs?since=${window.sinceTimestamp}`, options)
+    fetch(logsRequest)
         .then(res => res.json())
         .then(data => PollGameState.Renderer.renderCurrentInfo(data));
 }
