@@ -36,9 +36,9 @@ module Aggregates
       Result.new(schedules.sort_by { |s| s.scheduled_duration.first })
     end
 
-    def at(game_time)
+    def at(tick_event)
       events = relevant_events.select do |ev|
-        ev.registered_at <= game_time.registered_at
+        ev.registered_at <= tick_event.registered_at
       end
       reject_overlaps(events).sort_by { |s| s.scheduled_duration.first }
     end

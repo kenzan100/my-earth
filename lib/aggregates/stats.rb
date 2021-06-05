@@ -46,16 +46,21 @@ module Aggregates
       result = call
 
       base = (@events + result.produced_events + result.tick_events).sort_by(&:registered_at)
-      logs = base.select { |ev| ev.registered_at.to_i > since.to_i }.map do |e|
+
+      # when since only holds 6 fraction digit granularity, we want to floor it one less
+      # digit to avoid the duplicate hit
+      base = base.select { |ev| ev.registered_at.to_f.floor(5) > since.to_f }
+      logs = base.map do |e|
         {
           action: e.action,
           target: e.target.name,
           violations: e.violations,
           game_time: e.game_time&.iso8601,
-          registered_at: e.registered_at.iso8601,
+          registered_at: e.registered_at.iso8601(6),
           end_state: e.end_state,
           game_start: Game::START_TIME.iso8601,
-          elapsed: (e.registered_at - Game::START_TIME).floor
+          elapsed: (e.registered_at - Game::START_TIME).floor,
+          since: since.iso8601(6)
         }
       end
 

@@ -77,9 +77,9 @@ export const Renderer = {
         let base = `${Utils.capitalize(event.action)} ${event.target}. ${result}`;
         if (event.game_time) {
             const dateTime = Luxon.DateTime.fromISO(event.game_time);
-            return dateTime.toFormat('yyyy LLL dd');
+            return dateTime.toFormat('yyyy LLL dd') // + ' ' + event.registered_at + ' ' + event.since;
         } else {
-            return ` ${base}`;
+            return ` ${base}` // ${event.registered_at} ${event.since}`;
         }
     },
 

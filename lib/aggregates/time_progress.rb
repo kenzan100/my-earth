@@ -32,7 +32,11 @@ module Aggregates
             details.vectors,
             {
               duration: schedule_event.scheduled_duration.size, # hours
-              when: t.registered_at + i + 1
+              # Granularity of this "virtual" timestamp progression depends on
+              # how fast each tick is moving. If tick moves as fast as 500K faster than real time,
+              # fraction greater than this (e.g. 1 second shift) will move the events too far ahead and
+              # overlaps with next tick.
+              when: t.registered_at + ((i + 1) * 0.001)
             },
             rules: details.rules || []
           )
