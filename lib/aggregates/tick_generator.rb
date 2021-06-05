@@ -35,7 +35,7 @@ module Aggregates
     def calc_portion(time_pair, speed)
       starting, ending = time_pair
       elapsed = ending.registered_at - starting.registered_at
-      tick_rate = World::DAY_IN_SECONDS.to_f / speed
+      tick_rate = Game::DAY_IN_SECONDS.to_f / speed
 
       (elapsed / tick_rate).floor.times.map do |day_tick|
         registered_at = starting.registered_at + (day_tick * tick_rate)
@@ -46,7 +46,7 @@ module Aggregates
           [],
           {
             when: registered_at,
-            game_time: starting.registered_at + (day_tick * World::DAY_IN_SECONDS),
+            game_time: starting.registered_at + (day_tick * Game::DAY_IN_SECONDS),
             speed_val: speed
           }
         )

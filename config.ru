@@ -9,8 +9,6 @@ loader.enable_reloading
 loader.setup
 
 module World
-  DAY_IN_SECONDS = 86400
-
   MONEY_SPACE = Constructs::Space.new(:money)
   ENERGY_SPACE = Constructs::Space.new(:energy)
   COOKIE_SPACE = Constructs::Space.new(:cookie)
@@ -116,10 +114,11 @@ end
 module Game
   EVENTS = []
   SPEED_CHANGE_EVENTS = []
-  STATS = { World::MONEY_SPACE.name => 25 }
+  STATS = { }
   START_TIME = Time.now
   INITIAL_SPEED = 20_000 # how fast you want a day to pass (multiplier)
   LAST_STATS_PROCESSED_AT = { val: START_TIME }
+  DAY_IN_SECONDS = 86400
 end
 
 module Constants
