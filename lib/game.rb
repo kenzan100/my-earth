@@ -17,4 +17,8 @@ class Game
     @events.concat events
     self
   end
+
+  def add_speed_change_events(speed_change_events)
+    @speed_change_events.concat speed_change_events
+  end
 end

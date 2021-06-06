@@ -1,12 +1,9 @@
 class ChangeSpeedHandler
-  def initialize(events)
-    @events = events
-  end
-
-  def call(env)
+  def self.call(env)
+    game = env['GAME']
     req = Rack::Request.new(env)
     speed = req.params['speed'].to_i
-    prev = Game::SPEED_CHANGE_EVENTS.last&.current_speed || Game::INITIAL_SPEED
+    prev = game.speed_change_events.last&.current_speed || game.initial_speed
 
     unless speed.between?(1, 500_000) # max is just feeling for now
       return CommonResponse.unprocessable(
@@ -24,7 +21,7 @@ class ChangeSpeedHandler
       { when: Time.now, speed_val: speed }
     )
 
-    Game::SPEED_CHANGE_EVENTS << event
+    game.add_speed_change_events([event])
 
     [
       200,

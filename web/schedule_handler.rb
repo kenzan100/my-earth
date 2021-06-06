@@ -1,16 +1,13 @@
 class ScheduleHandler
-  def initialize(events)
-    @events = events
-  end
-
-  def call(env)
+  def self.call(env)
+    game = env['GAME']
     req = Rack::Request.new(env)
 
     if req.params.empty?
       return [
         200,
         Constants::TEXT_TYPE,
-        [ Aggregates::Schedule.new(@events).call.to_s ]
+        [ Aggregates::Schedule.new(game.events).call.to_s ]
       ]
     end
 
@@ -30,12 +27,12 @@ class ScheduleHandler
       schedule_parsed.event_option
     )
 
-    @events << event
+    game.add_events([event])
 
     return [
       200,
       { 'Content-Type' => 'text/plain' },
-      [ Aggregates::Schedule.new(@events).call.to_s ]
+      [ Aggregates::Schedule.new(game.events).call.to_s ]
     ]
   end
 
@@ -54,7 +51,7 @@ class ScheduleHandler
 
   # TODO schedule prob. can only be a vector space on its own
   # so that validations/side effects can be expressed uniformly
-  def parse_params(params)
+  def self.parse_params(params)
     violations = []
 
     unless [

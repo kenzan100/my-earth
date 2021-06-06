@@ -45,7 +45,7 @@ module MyEarth
         end
       end
 
-      class Schedule < Dry::CLI::Command
+      class Schedule < WithEnvLoader
         desc "Schedule your day"
 
         argument :allocatable
@@ -57,7 +57,7 @@ module MyEarth
           if [allocatable, action, start_time, end_time].none?
             puts 'reading your current schedule..'
 
-            res = Faraday.get(URL_HOST + "schedule")
+            res = @client.call("schedule")
             puts res.body
 
             return
@@ -66,13 +66,14 @@ module MyEarth
           if allocatable && action && start_time && end_time
             puts "Scheduling #{action} #{allocatable} from #{start_time} till #{end_time}..."
 
-            res = Faraday.get(
-              URL_HOST +
-                "schedule?"+
-                "target=#{allocatable}&"+
-                "scheduled_action=#{action}&"+
-                "scheduled_time_from=#{start_time}&"+
-                "scheduled_time_till=#{end_time}"
+            res = @client.call(
+              "schedule",
+              {
+                target: allocatable,
+                scheduled_action: action,
+                scheduled_time_from: start_time,
+                scheduled_time_till: end_time
+              }
             )
             puts res.body
 
@@ -82,31 +83,31 @@ module MyEarth
         end
       end
 
-      class Status < Dry::CLI::Command
+      class Status < WithEnvLoader
         desc "See current stats"
 
         def call(input: nil, **)
           puts "reading latest stats.."
 
-          res = Faraday.get(URL_HOST + "stats")
+          res = @client.call("stats", {})
           puts res.body
         end
       end
 
-      class Logs < Dry::CLI::Command
+      class Logs < WithEnvLoader
         argument :since
 
         def call(since: nil, **)
-          res = Faraday.get(URL_HOST + "logs?since=#{since}")
+          res = @client.call("logs", { since: since })
           puts res.body
         end
       end
 
-      class ChangeSpeed < Dry::CLI::Command
+      class ChangeSpeed < WithEnvLoader
         argument :val
 
         def call(val: nil, **)
-          res = Faraday.get(URL_HOST + "change_speed?speed=#{val}")
+          res = @client.call("change_speed", { speed: val })
           puts res.body
         end
       end

@@ -50,11 +50,11 @@ app = Rack::Builder.new do
   end
 
   map "/schedule" do
-    run ScheduleHandler.new []
+    run ScheduleHandler
   end
 
   map "/list" do
-    run ListHandler.new []
+    run ListHandler
   end
 
   map "/logs" do
@@ -62,7 +62,7 @@ app = Rack::Builder.new do
   end
 
   map "/change_speed" do
-    run ChangeSpeedHandler.new []
+    run ChangeSpeedHandler
   end
 
   map "/stats" do
@@ -71,9 +71,7 @@ app = Rack::Builder.new do
         200,
         Constants::JSON_TYPE,
         [
-          Aggregates::Stats.new(
-            Game::STATS, Game::EVENTS, Game::SPEED_CHANGE_EVENTS
-          ).call.to_h.to_json
+          Aggregates::Stats.new(env['GAME']).call.to_h.to_json
         ]
       ]
     end

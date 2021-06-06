@@ -1,9 +1,5 @@
 class ListHandler
-  def initialize(events)
-    @events = events
-  end
-
-  def call(env)
+  def self.call(env)
     req = Rack::Request.new(env)
 
     if req.params['text']
