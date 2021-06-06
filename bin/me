@@ -2,15 +2,27 @@
 
 require 'dry/cli'
 require 'faraday'
+require 'dotenv'
 
 URL_HOST = 'http://localhost:9292/'
+
+Dotenv.load
+
+class WithEnvLoader < Dry::CLI::Command
+  def initialize(**)
+    super
+    @client = ->(path, params) {
+      Faraday.get(URL_HOST + path, params, { 'MY_JOB_GAME_ID' => ENV['GAME_ID'] })
+    }
+  end
+end
 
 module MyEarth
   module MyJob
     module Commands
       extend Dry::CLI::Registry
 
-      class Action < Dry::CLI::Command
+      class Action < WithEnvLoader
         desc "List of one-off actions"
 
         argument :target, required: true, desc: "The name of goods for action. list to see the available goods."
@@ -20,12 +32,12 @@ module MyEarth
           if target == 'list'
             puts "List of available actions.."
             puts
-            res = Faraday.get(URL_HOST + "list?text=true")
+            res = @client.call("list", { text: true })
             puts res.body
           elsif target && action
             puts "trying to #{action} #{target}.."
 
-            res = Faraday.get(URL_HOST + "action?target=#{target}&action=#{action}")
+            res = @client.call("action", { target: target, action: action })
             puts res.body
           else
             puts "Usage: \"me action TARGET ACTION\""
@@ -99,11 +111,9 @@ module MyEarth
         end
       end
 
-      register 'stats', Status
-      register 'action', Action
-      register 'schedule', Schedule
-      register 'logs', Logs
-      register 'change_speed', ChangeSpeed
+      constants.each do |const|
+        register const.downcase.to_s, const_get(const)
+      end
     end
   end
 end

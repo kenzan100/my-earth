@@ -1,9 +1,6 @@
 class OneOffActionHandler
-  def initialize(events)
-    @events = events
-  end
-
-  def call(env)
+  def self.call(env)
+    game = env['GAME']
     req = Rack::Request.new(env)
 
     target_name = req.params['target'].to_sym
@@ -23,13 +20,8 @@ class OneOffActionHandler
       rules: action.rules || []
     )
 
-    result = Aggregates::Stats.new(
-      Game::STATS,
-      @events + [event],
-      Game::SPEED_CHANGE_EVENTS
-    ).call
-
-    @events << event
+    result = Aggregates::Stats.new(game).call
+    game.add_events([event])
     CommonResponse.success(result)
   end
 end

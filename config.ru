@@ -46,7 +46,7 @@ app = Rack::Builder.new do
   use GameChoice
 
   map "/action" do
-    run OneOffActionHandler.new([])
+    run OneOffActionHandler
   end
 
   map "/schedule" do
