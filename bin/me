@@ -4,9 +4,9 @@ require 'dry/cli'
 require 'faraday'
 require 'dotenv'
 
-URL_HOST = 'http://localhost:9292/'
-
 Dotenv.load
+
+URL_HOST = ENV['HOST_URL'] || 'http://localhost:9292/'
 
 class WithEnvLoader < Dry::CLI::Command
   def initialize(**)

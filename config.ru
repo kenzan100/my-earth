@@ -17,6 +17,14 @@ use Rack::Cors do
   end
 end
 
+use Rack::Static, {
+  urls: {
+    "/" => 'main.html',
+    "/src/out.js" => 'src/out.js'
+  },
+  root: 'clients'
+}
+
 GAMES = {}
 
 class GameChoice
@@ -25,7 +33,7 @@ class GameChoice
   end
 
   def call(env)
-    if %w[/init /list].include? env['REQUEST_PATH']
+    if %w[/init /list /].include? env['REQUEST_PATH']
       return @app.call(env)
     end
 
@@ -97,6 +105,7 @@ app = Rack::Builder.new do
       ]
     end
   end
+
 end
 
 run app
