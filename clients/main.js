@@ -3,11 +3,13 @@ import * as StaticComponent from './staticComponents';
 
 console.log("loaded");
 
+const urlParams = new URLSearchParams(window.location.search);
+const gameId = urlParams.get('game');
+
 const URL = 'http://localhost:9292';
-let options = { method: 'GET', headers: { 'MY_JOB_GAME_ID': 1 } }
+let options = { method: 'GET', headers: { 'MY_JOB_GAME_ID': gameId } }
 
 function fetchLogs() {
-    console.info(window.sinceTimestamp);
     const logsRequest = new Request(URL+`/logs?since=${window.sinceTimestamp}`, options)
     fetch(logsRequest)
         .then(res => res.json())
@@ -15,6 +17,7 @@ function fetchLogs() {
 }
 window.PollingIntervalId = window.setInterval(fetchLogs, 1000);
 
-fetch(URL+`/list`)
+listRequest = new Request(URL+`/list`)
+fetch(listRequest)
     .then(res => res.json())
     .then(data => StaticComponent.renderItems(data));

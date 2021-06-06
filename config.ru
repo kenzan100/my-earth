@@ -1,3 +1,4 @@
+require 'securerandom'
 require 'json'
 require 'rack/cors'
 require 'byebug'
@@ -16,9 +17,7 @@ use Rack::Cors do
   end
 end
 
-GAMES = {
-  1 => Game.new
-}
+GAMES = {}
 
 class GameChoice
   def initialize(app)
@@ -26,13 +25,20 @@ class GameChoice
   end
 
   def call(env)
-    game = GAMES[env["HTTP_MY_JOB_GAME_ID"].to_i]
+    if %w[/init /list].include? env['REQUEST_PATH']
+      return @app.call(env)
+    end
+
+    game = GAMES[env["HTTP_MY_JOB_GAME_ID"]]
 
     unless game
       return [
         404,
         Constants::TEXT_TYPE,
-        [ "game not found" ]
+        [
+          { error: "game not found. set HTTP_MY_JOB_GAME_ID to request header." +
+            "if not started yet, send init." }.to_json
+        ]
       ]
     end
 
@@ -44,6 +50,21 @@ end
 app = Rack::Builder.new do
   use Rack::ShowExceptions
   use GameChoice
+
+  map "/init" do
+    run ->(env) do
+      begin
+        game_id = SecureRandom.hex(2)
+      end while GAMES[game_id]
+
+      GAMES[game_id] = Game.new
+      [
+        200,
+        Constants::TEXT_TYPE,
+        [ "Game started with game_id: #{game_id}" ]
+      ]
+    end
+  end
 
   map "/action" do
     run OneOffActionHandler

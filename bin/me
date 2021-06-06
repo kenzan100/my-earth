@@ -57,7 +57,7 @@ module MyEarth
           if [allocatable, action, start_time, end_time].none?
             puts 'reading your current schedule..'
 
-            res = @client.call("schedule")
+            res = @client.call("schedule", {})
             puts res.body
 
             return
@@ -108,6 +108,13 @@ module MyEarth
 
         def call(val: nil, **)
           res = @client.call("change_speed", { speed: val })
+          puts res.body
+        end
+      end
+
+      class Init < WithEnvLoader
+        def call
+          res = @client.call("init", {})
           puts res.body
         end
       end

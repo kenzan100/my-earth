@@ -21,6 +21,15 @@ export const Utils = {
 
 export const Renderer = {
     renderCurrentInfo(data) {
+        if (data.error && data.error.includes("game not found")) {
+            Utils.clearChildren(GoalWindow);
+            this.showEndState(
+                "Game not found.",
+                "Make sure to start first and set game params."
+            );
+            window.clearInterval(window.PollingIntervalId);
+        }
+
         this.showStats(data.stats);
         this.showSchedule(data.schedule);
 
@@ -58,7 +67,10 @@ export const Renderer = {
 
         if (event.end_state) {
             Utils.clearChildren(GoalWindow);
-            this.showEndState(event);
+            this.showEndState(
+                'Goal achieved!',
+                `It took you ${event.elapsed} seconds to get there. Can you do it faster?`
+            );
             window.clearInterval(window.PollingIntervalId);
         }
 
@@ -83,13 +95,13 @@ export const Renderer = {
         }
     },
 
-    showEndState(event) {
+    showEndState(headerText, contentText) {
         const header = document.createElement('h1')
-        header.appendChild(document.createTextNode('Goal achieved!'))
-        const analysis = document.createElement('h4')
-        const base = `It took you ${event.elapsed} seconds to get there. Can you do it faster?`
-        analysis.appendChild(document.createTextNode(base))
-        GoalWindow.prepend(analysis);
+        header.appendChild(document.createTextNode(headerText));
+        const contents = document.createElement('h4')
+        const base = contentText;
+        contents.appendChild(document.createTextNode(base))
+        GoalWindow.prepend(contents);
         GoalWindow.prepend(header);
     },
 }
