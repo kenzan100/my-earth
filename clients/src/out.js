@@ -5072,7 +5072,7 @@
   console.log("loaded");
   var urlParams = new URLSearchParams(window.location.search);
   var gameId = urlParams.get("game");
-  var URL = "http://localhost:9292";
+  var URL = "https://polar-citadel-77237.herokuapp.com";
   var options = { method: "GET", headers: { "MY_JOB_GAME_ID": gameId } };
   function fetchLogs() {
     const logsRequest = new Request(URL + `/logs?since=${window.sinceTimestamp}`, options);
