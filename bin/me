@@ -17,6 +17,34 @@ class WithEnvLoader < Dry::CLI::Command
   end
 end
 
+class RewriteGameID < Dry::CLI::Command
+  desc "Rewrite game id"
+
+  argument :game_id, required: true, desc: "Game ID obtained from init command."
+
+  def call(game_id:, **)
+    file_path = './.env'
+    unless File.exists?(file_path)
+      puts ".env file not found. make sure you're in correct directory."
+    end
+
+    val = ''
+    File.readlines(file_path).each do |line|
+      if line.start_with?("GAME_ID=")
+        val << "GAME_ID=#{game_id}"
+      else
+        val << line
+      end
+    end
+
+    File.open(file_path, 'w') do |f|
+      f.puts val
+    end
+
+    puts "Wrote the new GAME_ID to .env file."
+  end
+end
+
 module MyEarth
   module MyJob
     module Commands
@@ -125,5 +153,7 @@ module MyEarth
     end
   end
 end
+
+MyEarth::MyJob::Commands.register 'set', RewriteGameID
 
 Dry::CLI.new(MyEarth::MyJob::Commands).call
