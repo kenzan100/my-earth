@@ -1,10 +1,11 @@
 class Game
   DAY_IN_SECONDS = 86400
 
-  attr_reader :start_time, :initial_speed
+  attr_reader :start_time, :initial_speed, :game_id
   attr_accessor :events, :speed_change_events, :stats
 
-  def initialize
+  def initialize(game_id)
+    @game_id = game_id
     @events = []
     @speed_change_events = []
     @stats = { money: 100 }

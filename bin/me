@@ -147,6 +147,28 @@ module MyEarth
         end
       end
 
+      class Destroy < WithEnvLoader
+        desc "destroy the game set in .env right now."
+        def call
+          puts "Destroying #{ENV['GAME_ID']}. Are you sure? (Y/n)"
+          input = STDIN.gets
+          unless input.upcase.start_with? 'Y'
+            puts 'abort.'
+            return
+          end
+
+          puts @client.call("destroy", {}).body
+        end
+      end
+
+      class Games < WithEnvLoader
+        desc "see list of running game ids."
+        def call
+          puts "reading a list of running games.."
+          puts @client.call("games", {}).body
+        end
+      end
+
       constants.each do |const|
         register const.downcase.to_s, const_get(const)
       end

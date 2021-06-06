@@ -33,7 +33,7 @@ class GameChoice
   end
 
   def call(env)
-    if %w[/init /list /].include? env['REQUEST_PATH']
+    if %w[/init /list / /games].include? env['REQUEST_PATH']
       return @app.call(env)
     end
 
@@ -65,11 +65,36 @@ app = Rack::Builder.new do
         game_id = SecureRandom.hex(2)
       end while GAMES[game_id]
 
-      GAMES[game_id] = Game.new
+      GAMES[game_id] = Game.new(game_id)
       [
         200,
         Constants::TEXT_TYPE,
         [ "Game started with game_id: #{game_id}" ]
+      ]
+    end
+  end
+
+  map "/destroy" do
+    # TODO double check?
+    run ->(env) do
+      game = env['GAME']
+      GAMES.delete(game.game_id)
+
+      [
+        200,
+        Constants::TEXT_TYPE,
+        [ "Game #{game.game_id} destroyed. It was nice running game with you." ]
+      ]
+    end
+  end
+
+  map "/games" do
+    # TODO some authentication
+    run ->(env) do
+      [
+        200,
+        Constants::TEXT_TYPE,
+        [ GAMES.keys.join("\n") ]
       ]
     end
   end
