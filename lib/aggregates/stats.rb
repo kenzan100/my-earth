@@ -19,6 +19,9 @@ module Aggregates
       end
     end
 
+    # how to express luck;
+    #   1. as another event?
+    #   2. as one off only?
     def call
       tick_events = Aggregates::TickGenerator.new(
         start_time: @start_time, events: @speed_change_events, initial_speed: @initial_speed

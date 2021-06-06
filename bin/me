@@ -9,10 +9,16 @@ Dotenv.load
 URL_HOST = ENV['HOST_URL'] || 'http://localhost:9292/'
 
 class WithEnvLoader < Dry::CLI::Command
+  FakeBody = Struct.new(:body)
+
   def initialize(**)
     super
     @client = ->(path, params) {
-      Faraday.get(URL_HOST + path, params, { 'MY_JOB_GAME_ID' => ENV['GAME_ID'] })
+      begin
+        Faraday.get(URL_HOST + path, params, { 'MY_JOB_GAME_ID' => ENV['GAME_ID'] })
+      rescue Faraday::ConnectionFailed
+        FakeBody.new "HOST_URL not set in environment variables."
+      end
     }
   end
 end
@@ -28,13 +34,19 @@ class RewriteGameID < Dry::CLI::Command
       puts ".env file not found. make sure you're in correct directory."
     end
 
+    already_set = false
     val = ''
     File.readlines(file_path).each do |line|
       if line.start_with?("GAME_ID=")
         val << "GAME_ID=#{game_id}"
+        already_set = true
       else
         val << line
       end
+    end
+
+    unless already_set
+      val << "GAME_ID=#{game_id}"
     end
 
     File.open(file_path, 'w') do |f|
