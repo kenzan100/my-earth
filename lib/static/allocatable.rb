@@ -1,11 +1,12 @@
 module Static
   class Allocatable
-    attr_reader :name, :item_type, :action_dict
+    attr_reader :name, :item_type, :action_dict, :labels
 
-    def initialize(canonical_name, item_type)
+    def initialize(canonical_name, item_type = :default, labels = [])
       @name = canonical_name
       @item_type = item_type
       @action_dict = {}
+      @labels = labels
     end
 
     def to_a
