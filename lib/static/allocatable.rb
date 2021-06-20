@@ -7,6 +7,11 @@ module Static
       @item_type = item_type
       @action_dict = {}
       @labels = labels
+      if @item_type == :job
+        World::JOBS[canonical_name] = self
+      else
+        World::ITEMS[canonical_name] = self
+      end
     end
 
     def to_a

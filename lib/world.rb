@@ -27,13 +27,8 @@ module World
     :money_achieved
   )
 
-  a = Static::Allocatable.new(:make_web_app_by_yourself)
-
-  # Lay out the job (or means to earn money), and ask what constraints (needed) to happen in order to get that.
-  # Labels to bridge the gap between canonical names, and the variations of same type of jobs.
-  # 1 base unit of experience, and various multipliers to accelerate the ROI per time to acquire 1 base unit per day
-  # (not every activity will create the equal weight)
-  # (to unlock certain multiplier, you need prior levels)
+  JOBS = {}
+  ITEMS = {}
 
   PURCHASE_VEC = Constructs::Vector.new(MONEY_SPACE, -10)
   PURCHASE_COOKIE_VEC = Constructs::Vector.new(COOKIE_SPACE, 1)
@@ -62,78 +57,22 @@ module World
     []
   )
 
+  a = Static::Allocatable.new(:make_web_app_by_yourself)
+
+  # Lay out the job (or means to earn money), and ask what constraints (needed) to happen in order to get that.
+  # Labels to bridge the gap between canonical names, and the variations of same type of jobs.
+  # 1 base unit of experience, and various multipliers to accelerate the ROI per time to acquire 1 base unit per day
+  # (not every activity will create the equal weight)
+  # (to unlock certain multiplier, you need prior levels)
+
   WEB_DEV_PORTFOLIO_SPACE = Constructs::Space.new(:web_dev_portfolio)
-  innobeta = Static::Allocatable.new(:entry_level_software_developer, :job)
-  innobeta.add_possible_action(
-    :work,
-    [],
-    [
-      Constructs::Violation.new(
-        WEB_DEV_PORTFOLIO_SPACE,
-        ->(v) { v < 6.months },
-        :portfolio_not_enough,
-        "web_dev_portfolio needs to be above 6 months worth"
-      )
-    ]
-  )
-
   ENGLISH_SKILL_SPACE = Constructs::Space.new(:english_skill)
-  chartmogul = Static::Allocatable.new(:mid_level_software_developer_abroad, :job)
-  chartmogul.add_possible_action(
-    :work,
-    [],
-    [
-      Constructs::Violation.new(
-        ENGLISH_SKILL_SPACE,
-        ->(v) { v < 1.year },
-        :cannot_speak_english,
-        "You cannot speak English yet"
-      ),
-      Constructs::Violation.new(
-        WEB_DEV_PORTFOLIO_SPACE,
-        ->(v) { v < 1.year },
-        :portfolio_not_enough,
-        "web_dev_portfolio needs to be above 1 yeaer or more"
-      )
-    ]
-  )
-
   Label = Struct.new(:id)
   DEV_LEAD_SPACE = Constructs::Space.new(:dev_lead_experience)
-  shopify = Static::Allocatable.new(
+  Static::Allocatable.new(
     :senior_level_software_developer_abroad,
     :job,
     [Label.new(:abroad), Label.new(:well_known)]
-  )
-  shopify.add_possible_action(
-    :work,
-    [],
-    [
-      Constructs::Violation.new(
-        ENGLISH_SKILL_SPACE,
-        ->(v) { v < 2.years },
-        :cannot_speak_english,
-        "You need 2 years more of English speaking experience at work."
-      ),
-      Constructs::Violation.new(
-        COMMUNICATION_SPACE,
-        ->(v) { v < 1.year },
-        :needs_to_appeal_yourself,
-        "You need 1 year or more of communication skill to PR yourself."
-      ),
-      Constructs::Violation.new(
-        WEB_DEV_PORTFOLIO_SPACE,
-        ->(v) { v < 3.years },
-        :portfolio_not_enough,
-        "3 or more years of web_dev_portfolio"
-      ),
-      Constructs::Violation.new(
-        DEV_LEAD_SPACE,
-        ->(v) { v < 6.months },
-        :dev_lead_check,
-        "at least 6 months of dev leads (tech lead, team lead or more)"
-      )
-    ]
   )
 
   SOFTWARE_ENGINEER = Static::Allocatable.new(:software_engineer, :job)
@@ -170,14 +109,4 @@ module World
       )
     ]
   )
-
-  ITEMS = {
-    cookie: COOKIE,
-    cs_book: CS_BOOK,
-  }
-
-  JOBS = {
-    software_engineer: SOFTWARE_ENGINEER,
-    mcdonald_part_time: MCDONALD_PART_TIME
-  }
 end
