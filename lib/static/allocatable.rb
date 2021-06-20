@@ -1,11 +1,17 @@
 module Static
   class Allocatable
-    attr_reader :name, :item_type, :action_dict
+    attr_reader :name, :item_type, :action_dict, :labels
 
-    def initialize(canonical_name, item_type)
+    def initialize(canonical_name, item_type = :default, labels = [])
       @name = canonical_name
       @item_type = item_type
       @action_dict = {}
+      @labels = labels
+      if @item_type == :job
+        World::JOBS[canonical_name] = self
+      else
+        World::ITEMS[canonical_name] = self
+      end
     end
 
     def to_a
@@ -19,7 +25,7 @@ module Static
         actions: action_dict.transform_values do |details|
           {
             vectors: details.vectors,
-            rules: details.rules.map(&:to_h)
+            validations: details.validations.map(&:to_h)
           }
         end
       }
@@ -29,14 +35,17 @@ module Static
       :permanent
     end
 
-    Details = Struct.new(:vectors, :rules) do
+    Details = Struct.new(:vectors, :validations) do
       def to_h
-        { vectors: vectors, rules: rules }
+        {
+          vectors: vectors,
+          validations: validations
+        }
       end
     end
 
-    def add_possible_action(action_name, vectors, rules)
-      @action_dict[action_name] = Details.new(vectors, rules)
+    def add_possible_action(action_name, vectors, validations)
+      @action_dict[action_name] = Details.new(vectors, validations)
     end
 
     def search(action)

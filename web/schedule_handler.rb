@@ -16,8 +16,8 @@ class ScheduleHandler
     return CommonResponse.not_found(target_name) unless allocatable
 
     schedule_parsed = parse_params(req.params)
-    unless schedule_parsed.violations.empty?
-      return CommonResponse.unprocessable(schedule_parsed.violations)
+    unless schedule_parsed.errors.empty?
+      return CommonResponse.unprocessable(schedule_parsed.errors)
     end
 
     event = Events::Event.new(
@@ -39,7 +39,7 @@ class ScheduleHandler
   private
 
   ParsedSchedule = Struct.new(:action, :time_from, :time_till)
-  Parsed = Struct.new(:violations, :result) do
+  Parsed = Struct.new(:errors, :result) do
     def event_option
       {
         as: result.action,
@@ -52,7 +52,7 @@ class ScheduleHandler
   # TODO schedule prob. can only be a vector space on its own
   # so that validations/side effects can be expressed uniformly
   def self.parse_params(params)
-    violations = []
+    errors = []
 
     unless [
       params['scheduled_action'],
@@ -62,18 +62,18 @@ class ScheduleHandler
       pp params['scheduled_action']
       pp params['scheduled_time_from']
       pp params['scheduled_time_till']
-      violations << "missing attribute: send all of scheduled_action, scheduled_time_from, and scheduled_time_till"
-      return Parsed.new(violations, nil)
+      errors << "missing attribute: send all of scheduled_action, scheduled_time_from, and scheduled_time_till"
+      return Parsed.new(errors, nil)
     end
 
     unless params['scheduled_time_from'].to_i.between?(0, 24) &&
       params['scheduled_time_till'].to_i.between?(0, 24)
-      violations << "scheduled_time_from and scheduled_time_till needs to be within 0 ~ 24 range"
-      return Parsed.new(violations, nil)
+      errors << "scheduled_time_from and scheduled_time_till needs to be within 0 ~ 24 range"
+      return Parsed.new(errors, nil)
     end
 
     Parsed.new(
-      violations,
+      errors,
       ParsedSchedule.new(
         params['scheduled_action'].to_sym,
         params['scheduled_time_from'].to_i,

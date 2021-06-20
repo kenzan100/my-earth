@@ -3,7 +3,7 @@ module TestHelper
     s1 = Constructs::Space.new(:cs_skill)
     s2 = Constructs::Space.new(:energy)
 
-    s2.add_violation(->(v) { v < 0 }, :energy_too_low, "Energy cannot go below 0")
+    s2.add_validation(->(v) { v < 0 }, :energy_too_low, "Energy cannot go below 0")
 
     vec1 = Constructs::Vector.new(s1, 10)
     vec2 = Constructs::Vector.new(s2, -5)

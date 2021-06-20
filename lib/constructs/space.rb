@@ -12,7 +12,7 @@ module Constructs
       @end_states = []
     end
 
-    def add_violation(rule, event_name, human_readable)
+    def add_validation(rule, event_name, human_readable)
       @conditions << Condition.new(rule, event_name, human_readable)
     end
 

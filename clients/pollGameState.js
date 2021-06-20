@@ -83,8 +83,8 @@ export const Renderer = {
 
     buildLogLine(event) {
         let result = ''
-        if (event.violations.length > 0) {
-            result = `Failed. ${event.violations.join(' ')}`;
+        if (event.errors.length > 0) {
+            result = `Failed. ${event.errors.join(' ')}`;
         }
         let base = `${Utils.capitalize(event.action)} ${event.target}. ${result}`;
         if (event.game_time) {
