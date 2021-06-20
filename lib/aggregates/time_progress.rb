@@ -4,14 +4,14 @@ module Aggregates
       @events = events
     end
 
-    Result = Struct.new(:events, :violations)
+    Result = Struct.new(:events, :errors)
 
     def call
       ticks = @events.select { |ev| ev.action == :tick }
       schedules = @events.select { |ev| ev.action == :schedule }
 
       produced_events = []
-      violations = []
+      errors = []
       ticks.sort_by(&:registered_at).each.with_index do |t, i|
         next if i == ticks.length - 1
 
@@ -22,7 +22,7 @@ module Aggregates
 
           unless details&.vectors
             msg = "#{item_or_job.name} does not know how to #{schedule_event.scheduled_action}"
-            violations << msg
+            errors << msg
             next
           end
 
@@ -45,7 +45,7 @@ module Aggregates
 
       Result.new(
         produced_events,
-        violations
+        errors
       )
     end
   end

@@ -10,11 +10,11 @@ module Aggregates
       @initial_speed = game.initial_speed
     end
 
-    Result = Struct.new(:attributes, :violations, :produced_events, :tick_events, :logs, :current_schedule) do
+    Result = Struct.new(:attributes, :errors, :produced_events, :tick_events, :logs, :current_schedule) do
       def to_h
         {
           stats: attributes.transform_values { |v| v.to_s },
-          violations: violations.uniq
+          errors: errors.uniq
         }
       end
     end
@@ -33,17 +33,17 @@ module Aggregates
       result_attrs = {}
       result_attrs.merge!(@base)
 
-      events_to_process = (@events + produced_events).sort_by(&:registered_at)
+      events_to_process = (@events + produced_events + tick_events).sort_by(&:registered_at)
       events_to_process.each do |event|
         process_event(event, result_attrs)
       end
 
       pp "#{tick_events.length} days passed.."
-      latest_violation = events_to_process.last&.violations || []
+      latest_error = events_to_process.last&.errors || []
 
       Result.new(
         result_attrs,
-        latest_violation + progress_result.violations,
+        latest_error + progress_result.errors,
         produced_events,
         tick_events
       )
@@ -61,7 +61,7 @@ module Aggregates
         {
           action: e.action,
           target: e.target.name,
-          violations: e.violations,
+          errors: e.errors,
           game_time: e.game_time&.iso8601,
           registered_at: e.registered_at.iso8601(6),
           end_state: e.end_state,
@@ -79,7 +79,7 @@ module Aggregates
     private
 
     def process_event(event, result_attrs)
-      violations = event.forces.flat_map do |vector|
+      space_errors = event.forces.flat_map do |vector|
         current_val = result_attrs[vector.space.name] || 0
 
         vector.space.conditions.map do |condition|
@@ -90,7 +90,7 @@ module Aggregates
         end
       end.compact
 
-      event_violations = event.rules.map do |rule|
+      event_errors = event.errors.map do |rule|
         vector = event.forces.find { |v| v.space.name == rule.space.name }
         current_val = result_attrs[rule.space.name] || 0
         movement = (vector&.magnitude || 0) * event.duration
@@ -99,10 +99,8 @@ module Aggregates
         end
       end.compact
 
-      violations.concat event_violations
-
-      if violations.any?
-        event.violations = violations
+      if (space_errors + event_errors).any?
+        event.errors = space_errors + event_errors
         return
       end
 

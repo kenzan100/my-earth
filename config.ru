@@ -26,6 +26,10 @@ use Rack::Static, {
 }
 
 GAMES = {}
+begin
+  game_id = SecureRandom.hex(2)
+end while GAMES[game_id]
+GAMES[game_id] = Game.new(game_id)
 
 class GameChoice
   def initialize(app)

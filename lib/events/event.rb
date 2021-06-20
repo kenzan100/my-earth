@@ -2,7 +2,7 @@ module Events
   class Event
     attr_reader :action, :target, :forces, :registered_at, :game_time, :rules, :duration
 
-    attr_accessor :violations, :end_state
+    attr_accessor :errors, :end_state
 
     def initialize(action, target, forces = [], options = {}, rules: [])
       @action = action
@@ -10,7 +10,7 @@ module Events
       @forces = forces
       @options = options
       @rules = rules
-      @violations = []
+      @errors = []
 
       @registered_at = options[:when] || Time.now
       @duration = options[:duration] || 1 # hour

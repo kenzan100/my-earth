@@ -1,0 +1,2 @@
+module SurvivalWorld
+end

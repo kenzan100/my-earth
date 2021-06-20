@@ -7,17 +7,17 @@ module World
   COMMUNICATION_SPACE = Constructs::Space.new(:communication_skill)
   NO_OP_SPACE = Constructs::Space.new(:no_op)
 
-  COOKIE_SPACE.add_violation(
+  COOKIE_SPACE.add_validation(
     ->(val) { val < 0 },
     :cookie_cannot_be_below_zero,
     "I can't consume what I don't have."
   )
-  ENERGY_SPACE.add_violation(
+  ENERGY_SPACE.add_validation(
     ->(val) { val < 0 },
     :i_am_too_tired,
     "I need more energy."
   )
-  MONEY_SPACE.add_violation(
+  MONEY_SPACE.add_validation(
     ->(val) { val < 0 },
     :money_cannot_go_below_zero,
     "I don't have enough money."
@@ -84,7 +84,7 @@ module World
       Constructs::Vector.new(MONEY_SPACE, 30)
     ],
     [
-      Constructs::Violation.new(
+      Constructs::Validation.new(
         CS_SKILL_SPACE,
         ->(v) { v < 10 },
         :my_cs_skill_is_too_low,
@@ -101,7 +101,7 @@ module World
       Constructs::Vector.new(MONEY_SPACE, 12)
     ],
     [
-      Constructs::Violation.new(
+      Constructs::Validation.new(
         NO_OP_SPACE,
         ->(v) { rand > 1 },
         :do_not_feel_like_it,
