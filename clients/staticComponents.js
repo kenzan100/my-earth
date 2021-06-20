@@ -16,7 +16,7 @@ function renderCategory(items, parentNode) {
         parentNode.appendChild(targetNode);
 
         Object.entries(obj.actions).forEach(([actionName, details]) => {
-            console.info(details.rules)
+            console.info(details.validations)
             const base = `${actionName} (${details.vectors.join(', ')})`
             const text = document.createTextNode(base);
             const innerLi = document.createElement('li')
@@ -24,7 +24,7 @@ function renderCategory(items, parentNode) {
             innerList.appendChild(innerLi)
 
             const ruleLi = document.createElement('ul');
-            details.rules.forEach(rule => {
+            details.validations.forEach(rule => {
                 const text = document.createTextNode(`${rule.rule}`);
                 const eachRule = document.createElement('li');
                 eachRule.appendChild(text)

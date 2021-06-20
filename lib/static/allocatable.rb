@@ -25,7 +25,7 @@ module Static
         actions: action_dict.transform_values do |details|
           {
             vectors: details.vectors,
-            rules: details.rules.map(&:to_h)
+            validations: details.validations.map(&:to_h)
           }
         end
       }
@@ -35,14 +35,17 @@ module Static
       :permanent
     end
 
-    Details = Struct.new(:vectors, :rules) do
+    Details = Struct.new(:vectors, :validations) do
       def to_h
-        { vectors: vectors, rules: rules }
+        {
+          vectors: vectors,
+          validations: validations
+        }
       end
     end
 
-    def add_possible_action(action_name, vectors, rules)
-      @action_dict[action_name] = Details.new(vectors, rules)
+    def add_possible_action(action_name, vectors, validations)
+      @action_dict[action_name] = Details.new(vectors, validations)
     end
 
     def search(action)

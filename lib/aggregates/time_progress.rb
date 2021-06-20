@@ -38,7 +38,7 @@ module Aggregates
               # overlaps with next tick.
               when: t.registered_at + ((i + 1) * 0.001)
             },
-            rules: details.rules || []
+            validations: details.validations || []
           )
         end
       end

@@ -17,7 +17,7 @@ class OneOffActionHandler
       item_or_job,
       action.vectors,
       { when: Time.now },
-      rules: action.rules || []
+      validations: action.validations || []
     )
 
     result = Aggregates::Stats.new(game).call
