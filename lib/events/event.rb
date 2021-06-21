@@ -10,10 +10,11 @@ module Events
       @forces = forces
       @options = options
       @validations = validations
-      @errors = []
-
       @registered_at = options[:when] || Time.now
       @duration = options[:duration] || 1 # hour
+
+      # state
+      @errors = []
     end
 
     def scheduled_action

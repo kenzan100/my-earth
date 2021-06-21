@@ -90,7 +90,7 @@ module Aggregates
         end
       end.compact
 
-      event_errors = event.errors.map do |rule|
+      event_errors = event.validations.map do |rule|
         vector = event.forces.find { |v| v.space.name == rule.space.name }
         current_val = result_attrs[rule.space.name] || 0
         movement = (vector&.magnitude || 0) * event.duration

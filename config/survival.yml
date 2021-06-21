@@ -1,0 +1,27 @@
+allocatables:
+  -
+    item_name: bed
+    actions:
+      -
+        action_name: sleep
+        vectors:
+          -
+            space: sleep
+            magnitude: 1
+        validations:
+          -
+            validation_space: bed
+            trigger: v < 1
+            message: "I don't have bed"
+      -
+        action_name: purchase
+        vectors:
+          -
+            space: money
+            magnitude: -100
+          -
+            space: bed
+            magnitude: 1
+  -
+    name: fuga
+    age: 20

@@ -44,7 +44,10 @@ module Aggregates
         Events::GameTime.new(
           :tick,
           :game_time,
-          [],
+          [
+            Constructs::Vector.new(SurvivalWorld::SPACES[:sleep], -5),
+            Constructs::Vector.new(SurvivalWorld::SPACES[:hunger], -5)
+          ],
           {
             when: registered_at,
             game_time: starting.registered_at + (day_tick * Game::DAY_IN_SECONDS),

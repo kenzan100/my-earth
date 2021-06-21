@@ -9,6 +9,7 @@ GEM
       ruby2_keywords
     minitest (5.14.4)
     multipart-post (2.1.1)
+    psych (4.0.1)
     rack (2.2.3)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
@@ -25,10 +26,14 @@ DEPENDENCIES
   dry-cli
   faraday
   minitest
+  psych
   rack
   rack-cors
   webrick
   zeitwerk
+
+RUBY VERSION
+   ruby 3.0.1p64
 
 BUNDLED WITH
    2.2.15

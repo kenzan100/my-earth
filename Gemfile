@@ -18,3 +18,4 @@ gem 'rack-cors'
 
 gem 'byebug'
 
+gem 'psych'

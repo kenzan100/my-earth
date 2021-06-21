@@ -5050,14 +5050,14 @@
       targetNode.appendChild(innerList);
       parentNode.appendChild(targetNode);
       Object.entries(obj.actions).forEach(([actionName, details]) => {
-        console.info(details.rules);
+        console.info(details.validations);
         const base = `${actionName} (${details.vectors.join(", ")})`;
         const text = document.createTextNode(base);
         const innerLi = document.createElement("li");
         innerLi.appendChild(text);
         innerList.appendChild(innerLi);
         const ruleLi = document.createElement("ul");
-        details.rules.forEach((rule) => {
+        details.validations.forEach((rule) => {
           const text2 = document.createTextNode(`${rule.rule}`);
           const eachRule = document.createElement("li");
           eachRule.appendChild(text2);

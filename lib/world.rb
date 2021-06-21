@@ -54,7 +54,14 @@ module World
       Constructs::Vector.new(CS_SKILL_SPACE, 1),
       Constructs::Vector.new(ENERGY_SPACE, -30)
     ],
-    []
+    [
+      Constructs::Validation.new(
+        CS_BOOK_SPACE,
+        ->(v) { v < 1 },
+        :cs_book_no,
+        "I don't have cs_book yet"
+      )
+    ]
   )
 
   a = Static::Allocatable.new(:make_web_app_by_yourself)
